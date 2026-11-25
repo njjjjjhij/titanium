@@ -1,0 +1,3267 @@
+<!doctype html>
+<html lang="en" data-theme="midnight" data-device="mobile" data-density="comfortable">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#15161a">
+  <meta name="description" content="Titanium — a private, customizable browser with ad blocking, a VPN, history delegation, extensions and three plans.">
+  <title>Titanium</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <style>/* ============================================================
+   Titanium — design system
+   Mobile-first. The screenshot look: near-black canvas, soft
+   charcoal cards, a blue-grey search pill and one accent hue.
+   ============================================================ */
+
+:root {
+  --bg: #15161a;
+  --bg-deep: #0e0f12;
+  --card: #23252a;
+  --card-2: #2a2d33;
+  --card-3: #33363d;
+  --line: rgba(255, 255, 255, .08);
+  --line-strong: rgba(255, 255, 255, .14);
+  --text: #f1f4f9;
+  --muted: #99a2b0;
+  --muted-2: #6f7887;
+  --accent: #8ab4f8;
+  --accent-ink: #0c1421;
+  --pill: #2f3b52;
+  --pill-ink: #eaf1ff;
+  --danger: #ff7b7b;
+  --ok: #74d6a3;
+  --r: 22px;
+  --r-sm: 14px;
+  --r-xs: 10px;
+  --pad: 20px;
+  --gap: 14px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .45);
+  --sheet-max: 560px;
+  --shell-max: 520px;
+  color-scheme: dark;
+}
+
+html[data-theme="slate"] {
+  --bg: #1b2029;
+  --bg-deep: #12161d;
+  --card: #262c37;
+  --card-2: #2e3542;
+  --card-3: #38404f;
+  --pill: #35455f;
+}
+html[data-theme="oled"] {
+  --bg: #000;
+  --bg-deep: #000;
+  --card: #0d0d0f;
+  --card-2: #141417;
+  --card-3: #1b1b1f;
+  --line: rgba(255, 255, 255, .1);
+  --pill: #101318;
+}
+html[data-theme="day"] {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --bg-deep: #e9edf5;
+  --card: #fff;
+  --card-2: #f1f4fa;
+  --card-3: #e6ebf4;
+  --line: rgba(16, 24, 40, .09);
+  --line-strong: rgba(16, 24, 40, .16);
+  --text: #121821;
+  --muted: #5c6779;
+  --muted-2: #8b95a5;
+  --pill: #e4ecfb;
+  --pill-ink: #17233a;
+  --accent-ink: #fff;
+  --shadow: 0 18px 50px rgba(21, 33, 61, .14);
+}
+html[data-theme="sepia"] {
+  color-scheme: light;
+  --bg: #f6efe4;
+  --bg-deep: #ece1d1;
+  --card: #fffaf1;
+  --card-2: #f4ebdc;
+  --card-3: #e9dcc8;
+  --line: rgba(80, 55, 25, .12);
+  --line-strong: rgba(80, 55, 25, .2);
+  --text: #241a0e;
+  --muted: #6e5c45;
+  --muted-2: #96826a;
+  --pill: #eadfcd;
+  --pill-ink: #2a1e10;
+  --accent-ink: #fff;
+  --shadow: 0 18px 50px rgba(84, 58, 24, .16);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* the hidden attribute must always win over component display rules */
+[hidden] { display: none !important; }
+
+html, body { margin: 0; min-height: 100%; }
+
+body {
+  background:
+    radial-gradient(1100px 600px at 80% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 0% 100%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 55%),
+    var(--bg-deep);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+::selection { background: color-mix(in srgb, var(--accent) 45%, transparent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- boot ---------- */
+.boot {
+  position: fixed; inset: 0; z-index: 90; display: grid; align-content: center; justify-items: center; gap: 8px;
+  background: var(--bg-deep); transition: opacity .35s ease, visibility .35s;
+}
+.boot[hidden] { display: none; }
+.boot.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+.boot-icon { width: 84px; height: 84px; border-radius: 22px; box-shadow: var(--shadow); }
+.boot-name { font-size: 22px; font-weight: 750; letter-spacing: -.02em; margin-top: 8px; }
+.boot-sub { color: var(--muted); font-size: 13px; }
+
+/* ---------- app shell ---------- */
+.app {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, var(--accent) 4%), var(--bg) 240px);
+  position: relative;
+}
+@media (min-width: 700px) {
+  .app {
+    min-height: calc(100dvh - 48px);
+    margin: 24px auto;
+    border: 1px solid var(--line);
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: var(--shadow), 0 0 0 8px rgba(255, 255, 255, .02);
+  }
+}
+html[data-device="pc"] .app { max-width: 1180px; min-height: 100dvh; margin: 0 auto; border-radius: 0; border: 0; box-shadow: none; }
+html[data-device="pc"] .home { padding: 26px clamp(20px, 4vw, 52px) 40px; }
+html[data-device="pc"] .homegrid { grid-template-columns: 1.05fr .95fr; align-items: stretch; }
+html[data-device="pc"] .safety-row { gap: 18px; }
+html[data-device="pc"] .quicklinks { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-content: space-between; }
+
+/* ---------- topbar ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 6px;
+  padding: calc(10px + env(safe-area-inset-top)) 12px 10px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 1px solid transparent;
+}
+.topbar.scrolled { border-bottom-color: var(--line); }
+.icon-btn {
+  flex: 0 0 auto; width: 40px; height: 40px; display: grid; place-items: center;
+  border: 0; border-radius: 12px; background: transparent; color: var(--text);
+}
+.icon-btn:hover { background: var(--card-2); }
+.icon-btn:active { transform: scale(.94); }
+.tabstrip {
+  flex: 1 1 auto; display: flex; align-items: center; gap: 8px;
+  overflow-x: auto; scrollbar-width: none; padding: 2px;
+}
+.tabstrip::-webkit-scrollbar { display: none; }
+.tab-tile {
+  flex: 0 0 auto; min-width: 40px; height: 40px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 0; border-radius: 12px;
+  background: var(--card-2); color: var(--text);
+  font-weight: 700; font-size: 14px; letter-spacing: -.01em;
+}
+.tab-tile.active { background: var(--card-3); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.tab-tile .tile-badge { width: 18px; height: 18px; border-radius: 6px; display: grid; place-items: center; font-size: 10px; color: #0b1220; background: var(--accent); }
+.tab-tile.home { background: transparent; }
+.count-chip {
+  flex: 0 0 auto; min-width: 34px; height: 30px; padding: 0 8px;
+  border-radius: 10px; border: 1.5px solid var(--line-strong); background: transparent;
+  color: var(--text); font-weight: 700; font-size: 13px;
+}
+.count-chip:hover { background: var(--card-2); }
+
+/* ---------- home ---------- */
+.stage { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+.home { padding: 6px var(--pad) 40px; display: flex; flex-direction: column; gap: var(--gap); }
+.home-head { display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 2px; }
+.hello { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .01em; }
+.plan-pill {
+  border: 1px solid var(--line-strong); background: var(--card-2); color: var(--text);
+  border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 700;
+}
+.plan-pill.ult { border-color: color-mix(in srgb, var(--accent) 60%, transparent); color: var(--accent); }
+
+.searchpill {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 60px; padding: 8px 10px 8px 12px;
+  background: var(--pill); border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .22);
+}
+.searchpill:focus-within { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.engine-badge {
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 800; font-size: 15px;
+  color: #fff; background: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+}
+.searchpill input {
+  flex: 1 1 auto; min-width: 0; border: 0; background: transparent; color: var(--pill-ink);
+  font-size: 16.5px; font-weight: 650; letter-spacing: -.01em; outline: none;
+}
+.searchpill input::placeholder { color: color-mix(in srgb, var(--pill-ink) 78%, transparent); font-weight: 600; }
+.mic {
+  flex: 0 0 auto; width: 40px; height: 40px; display: grid; place-items: center;
+  border: 0; border-radius: 50%; background: transparent; color: var(--pill-ink);
+}
+.mic:hover { background: rgba(255, 255, 255, .08); }
+.mic.live { color: var(--danger); animation: pulse 1.1s infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+
+.suggest {
+  margin-top: -2px; background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--r-sm); overflow: hidden; box-shadow: var(--shadow);
+}
+.suggest button {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 11px 14px; border: 0; background: transparent; text-align: left; font-size: 14px;
+}
+.suggest button:hover { background: var(--card-2); }
+.suggest .sug-type { color: var(--muted); font-size: 11px; margin-left: auto; }
+
+.homegrid { display: grid; gap: var(--gap); grid-template-columns: 1fr; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); }
+.addnew {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
+  padding: var(--pad); text-align: left; color: var(--text); min-height: 128px;
+  transition: transform .16s ease, background .16s ease;
+}
+.addnew:hover { background: var(--card-2); transform: translateY(-1px); }
+.plus-tile {
+  width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center;
+  background: var(--card-3); color: var(--text);
+}
+.addnew-label { font-size: 15px; font-weight: 650; }
+
+.safety { padding: var(--pad); display: flex; flex-direction: column; gap: 16px; }
+.card-kicker { font-size: 14px; font-weight: 650; color: color-mix(in srgb, var(--text) 88%, var(--muted)); }
+.safety-row { display: flex; align-items: flex-start; gap: 16px; }
+.shield-tile {
+  flex: 0 0 auto; width: 56px; height: 56px; border-radius: 18px;
+  display: grid; place-items: center; background: var(--card-2);
+  color: var(--accent); border: 1px solid var(--line);
+}
+.shield-tile svg { width: 28px; height: 28px; }
+.safety-copy h3 { margin: 4px 0 4px; font-size: 22px; line-height: 1.15; letter-spacing: -.02em; font-weight: 750; }
+.safety-copy p { margin: 0; color: var(--muted); font-size: 13.5px; font-weight: 550; }
+.safety.armed .shield-tile { background: color-mix(in srgb, var(--accent) 22%, var(--card-2)); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.accent-btn {
+  align-self: flex-end; border: 0; border-radius: 999px; padding: 13px 22px;
+  background: var(--accent); color: var(--accent-ink); font-size: 15.5px; font-weight: 700;
+  transition: filter .15s ease, transform .12s ease;
+}
+.accent-btn:hover { filter: brightness(1.06); }
+.accent-btn:active { transform: scale(.97); }
+
+.quicklinks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.quicklink {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 12px 6px; border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--card) 78%, transparent); color: var(--text);
+  font-size: 12px; font-weight: 600; overflow: hidden;
+}
+.quicklink:hover { background: var(--card-2); }
+.quicklink .ql-badge {
+  width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center;
+  font-weight: 800; font-size: 15px;
+}
+.quicklink span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.status-card { padding: 16px var(--pad); display: flex; flex-direction: column; gap: 14px; background: color-mix(in srgb, var(--card) 70%, transparent); }
+.status-item { display: flex; align-items: center; gap: 12px; }
+.status-item b { display: block; font-size: 13.5px; font-weight: 650; }
+.status-item small { color: var(--muted); font-size: 12px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted-2); flex: 0 0 auto; box-shadow: 0 0 0 4px color-mix(in srgb, var(--muted-2) 18%, transparent); }
+.dot.on { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 20%, transparent); }
+.dot.warn { background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+
+.recent { display: flex; flex-direction: column; gap: 10px; }
+.recent-head { display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px; }
+.recent-head h3 { margin: 0; font-size: 14px; font-weight: 650; color: var(--muted); letter-spacing: .01em; }
+.recent-head button { border: 0; background: transparent; color: var(--accent); font-size: 12.5px; font-weight: 650; }
+.recent-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm);
+  text-align: left; color: var(--text);
+}
+.recent-item:hover { background: var(--card-2); }
+.recent-item .r-badge { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; font-size: 12px; font-weight: 800; background: var(--card-3); color: var(--text); flex: 0 0 auto; }
+.recent-item .r-body { min-width: 0; }
+.recent-item b { display: block; font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recent-item small { color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+/* ---------- page view ---------- */
+.page { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+.addressbar {
+  display: flex; align-items: center; gap: 6px; margin: 4px var(--pad) 10px;
+  padding: 6px 6px 6px 10px; background: var(--card); border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.addressbar input { flex: 1 1 auto; min-width: 0; border: 0; background: transparent; outline: none; font-size: 14px; font-weight: 550; }
+.lock { display: grid; place-items: center; color: var(--ok); }
+.lock svg { width: 15px; height: 15px; }
+.lock.insecure { color: var(--muted-2); }
+.addr-btn { border: 0; background: transparent; color: var(--text); width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; }
+.addr-btn:hover { background: var(--card-2); }
+
+.frame-wrap { position: relative; flex: 1 1 auto; min-height: 48vh; margin: 0 var(--pad) 16px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: var(--card); }
+.frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; min-height: 48vh; }
+html[data-device="pc"] .frame-wrap { flex: 1 1 auto; min-height: 62vh; }
+html[data-device="pc"] .frame-wrap iframe { min-height: 62vh; }
+.frame-fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: var(--card); }
+.ff-inner { max-width: 360px; text-align: center; }
+.ff-icon { width: 58px; height: 58px; border-radius: 18px; display: inline-grid; place-items: center; background: var(--card-2); color: var(--accent); margin-bottom: 12px; }
+.ff-icon svg { width: 28px; height: 28px; }
+.ff-inner h3 { margin: 0 0 8px; font-size: 19px; letter-spacing: -.02em; }
+.ff-inner p { margin: 0 0 18px; color: var(--muted); font-size: 13.5px; }
+.ff-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ---------- sheet ---------- */
+.sheet { position: fixed; inset: 0; z-index: 60; display: flex; justify-content: center; }
+.sheet[hidden] { display: none; }
+.sheet::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, .5); backdrop-filter: blur(3px); }
+.sheet-shell {
+  position: relative; z-index: 1; width: 100%; max-width: var(--sheet-max);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 26px 26px 0 0;
+  align-self: flex-end; max-height: 94dvh; display: flex; flex-direction: column;
+  box-shadow: var(--shadow); animation: sheetIn .26s cubic-bezier(.22, 1, .36, 1);
+}
+@media (min-width: 700px) {
+  .sheet-shell { align-self: center; border-radius: 26px; max-height: 88dvh; }
+}
+@keyframes sheetIn { from { transform: translateY(18px); opacity: 0; } }
+.sheet-head { display: flex; align-items: center; gap: 6px; padding: 12px 10px; border-bottom: 1px solid var(--line); }
+.sheet-head h2 { flex: 1 1 auto; margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -.015em; }
+.sheet-body { padding: 16px var(--pad) calc(28px + env(safe-area-inset-bottom)); overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.sheet-body > * { flex: 0 0 auto; }
+
+.section-label { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-2); margin: 10px 2px 0; }
+.list { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm); overflow: hidden; }
+.list-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; width: 100%;
+  padding: 13px 14px; border: 0; border-bottom: 1px solid var(--line);
+  background: transparent; text-align: left; color: var(--text);
+}
+.list-row:last-child { border-bottom: 0; }
+button.list-row:hover { background: var(--card-2); }
+.list-row .lr-icon { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--card-2); color: var(--accent); flex: 0 0 auto; }
+.list-row .lr-icon svg { width: 18px; height: 18px; }
+.list-row .lr-body { flex: 1 1 auto; min-width: 0; }
+.list-row b { display: block; font-size: 14px; font-weight: 600; }
+.list-row small { display: block; color: var(--muted); font-size: 12px; }
+.list-row .chev { color: var(--muted-2); font-size: 18px; }
+.list-row .chips { padding: 0; justify-content: flex-end; }
+.list-row .chip { padding: 5px 10px; font-size: 12px; }
+
+.toggle { position: relative; flex: 0 0 auto; width: 46px; height: 28px; border-radius: 999px; border: 0; background: var(--card-3); transition: background .18s; }
+.toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .18s; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+.toggle[aria-pressed="true"] { background: var(--accent); }
+.toggle[aria-pressed="true"]::after { transform: translateX(18px); background: var(--accent-ink); }
+html[data-theme="day"] .toggle[aria-pressed="true"]::after, html[data-theme="sepia"] .toggle[aria-pressed="true"]::after { background: #fff; }
+
+.field { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; }
+.field label { font-size: 12px; font-weight: 650; color: var(--muted); }
+.field input[type="text"], .field input[type="email"], .field select, .field textarea {
+  width: 100%; padding: 10px 12px; border-radius: var(--r-xs);
+  border: 1px solid var(--line-strong); background: var(--card-2); outline: none; font-size: 14px;
+}
+.field textarea { resize: vertical; min-height: 84px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+.field .hint { font-size: 11.5px; color: var(--muted-2); }
+.range-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; }
+.range-row input[type="range"] { flex: 1 1 auto; accent-color: var(--accent); }
+.range-row output { min-width: 46px; text-align: right; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+.chip {
+  border: 1px solid var(--line-strong); background: var(--card-2); color: var(--text);
+  border-radius: 999px; padding: 7px 13px; font-size: 12.5px; font-weight: 600;
+}
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chip.lock::after { content: " ★"; font-size: 10px; }
+
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 14px; }
+.swatch { width: 34px; height: 34px; border-radius: 50%; border: 2px solid transparent; position: relative; }
+.swatch[aria-pressed="true"] { border-color: var(--text); box-shadow: 0 0 0 2px var(--bg) inset; }
+.swatch.lock { opacity: .55; }
+
+.plan-grid { display: grid; gap: 12px; }
+.plan {
+  border: 1px solid var(--line); border-radius: var(--r); padding: 16px;
+  background: var(--card); display: flex; flex-direction: column; gap: 10px;
+}
+.plan.current { border-color: color-mix(in srgb, var(--accent) 55%, transparent); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+.plan .plan-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.plan h3 { margin: 0; font-size: 17px; letter-spacing: -.02em; }
+.plan .price { font-size: 13px; font-weight: 700; color: var(--accent); }
+.plan ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.plan li { display: flex; gap: 8px; font-size: 12.8px; color: var(--muted); }
+.plan li::before { content: "✓"; color: var(--ok); font-weight: 800; }
+.plan li.off { opacity: .5; }
+.plan li.off::before { content: "–"; color: var(--muted-2); }
+.plan .plan-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+.mini-btn {
+  border: 1px solid var(--line-strong); background: var(--card-2); color: var(--text);
+  border-radius: 10px; padding: 8px 12px; font-size: 12.5px; font-weight: 650;
+}
+.mini-btn:hover { background: var(--card-3); }
+.mini-btn.accent { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.mini-btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, transparent); }
+
+.empty { padding: 26px 16px; text-align: center; color: var(--muted); font-size: 13px; }
+.empty b { display: block; color: var(--text); font-size: 14.5px; margin-bottom: 4px; }
+
+.banner {
+  display: flex; gap: 12px; align-items: flex-start; padding: 13px 14px;
+  border-radius: var(--r-sm); background: color-mix(in srgb, var(--accent) 12%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); font-size: 12.5px;
+}
+.banner svg { width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent); margin-top: 1px; }
+.banner b { display: block; margin-bottom: 2px; }
+
+.engine-row { display: flex; align-items: center; gap: 12px; }
+.engine-logo { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 800; color: #fff; }
+
+.ext-card { border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--card); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.ext-head { display: flex; align-items: center; gap: 12px; }
+.ext-logo { width: 36px; height: 36px; border-radius: 10px; background: var(--card-3); display: grid; place-items: center; font-weight: 800; font-size: 14px; flex: 0 0 auto; }
+.ext-body { flex: 1 1 auto; min-width: 0; }
+.ext-body b { font-size: 14px; }
+.ext-body small { display: block; color: var(--muted); font-size: 11.5px; }
+.perm-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.perm { font-size: 10.5px; padding: 3px 8px; border-radius: 999px; background: var(--card-2); color: var(--muted); border: 1px solid var(--line); }
+.ext-popup-preview { border: 1px dashed var(--line-strong); border-radius: 10px; padding: 8px; }
+.ext-popup-preview iframe { width: 100%; height: 260px; border: 0; border-radius: 8px; background: #fff; }
+
+.hist-row { display: flex; align-items: center; gap: 10px; }
+.hist-row .h-body { flex: 1 1 auto; min-width: 0; }
+.hist-row b { font-size: 13px; font-weight: 600; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist-row small { color: var(--muted); font-size: 11.5px; }
+.code-box {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px;
+  background: var(--card-2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px; word-break: break-all; max-height: 120px; overflow: auto; color: var(--muted);
+}
+
+/* ---------- modal ---------- */
+.modal { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 20px; }
+.modal[hidden] { display: none; }
+.modal::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, .55); backdrop-filter: blur(4px); }
+.modal-card {
+  position: relative; width: 100%; max-width: 420px; background: var(--bg);
+  border: 1px solid var(--line-strong); border-radius: 22px; padding: 22px;
+  box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px;
+}
+.modal-card h3 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
+.modal-card p { margin: 0; color: var(--muted); font-size: 13.5px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; flex-wrap: wrap; }
+
+.primary-btn { border: 0; border-radius: 999px; padding: 11px 20px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14px; }
+.primary-btn:hover { filter: brightness(1.06); }
+.ghost-btn { border: 1px solid var(--line-strong); border-radius: 999px; padding: 10px 18px; background: transparent; color: var(--text); font-weight: 650; font-size: 13.5px; }
+.ghost-btn:hover { background: var(--card-2); }
+.ghost-btn[hidden] { display: none; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 16px);
+  z-index: 95; padding: 11px 18px; border-radius: 999px;
+  background: var(--card-3); color: var(--text); font-size: 13px; font-weight: 600;
+  box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: all .22s ease;
+  max-width: min(92vw, 460px); text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- onboarding ---------- */
+.onboard { position: fixed; inset: 0; z-index: 70; display: flex; justify-content: center; background: var(--bg-deep); }
+.onboard[hidden] { display: none; }
+.onboard-shell {
+  width: 100%; max-width: 560px; display: flex; flex-direction: column;
+  padding: calc(18px + env(safe-area-inset-top)) 20px calc(18px + env(safe-area-inset-bottom));
+  gap: 14px; max-height: 100dvh;
+}
+.onboard-top { display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 750; letter-spacing: -.02em; }
+.brand-mark { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--card-2); border: 1px solid var(--line-strong); font-size: 12px; font-weight: 800; color: var(--accent); }
+.progress { display: flex; gap: 6px; }
+.progress i { flex: 1 1 auto; height: 4px; border-radius: 999px; background: var(--card-3); transition: background .2s; }
+.progress i.on { background: var(--accent); }
+.onboard-body { flex: 1 1 auto; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 6px 2px 4px; scrollbar-width: thin; scrollbar-color: var(--card-3) transparent; }
+.onboard-body::-webkit-scrollbar, .sheet-body::-webkit-scrollbar { width: 8px; }
+.onboard-body::-webkit-scrollbar-thumb, .sheet-body::-webkit-scrollbar-thumb { background: var(--card-3); border-radius: 999px; }
+.onboard-body::-webkit-scrollbar-track, .sheet-body::-webkit-scrollbar-track { background: transparent; }
+.onboard-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.onboard-foot .primary-btn { margin-left: auto; }
+.step-kicker { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted-2); }
+.step-title { margin: 0; font-size: 27px; line-height: 1.12; letter-spacing: -.03em; font-weight: 780; }
+.step-sub { margin: 0; color: var(--muted); font-size: 14px; }
+.opt-grid { display: grid; gap: 10px; }
+.opt {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px; text-align: left;
+  border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--card); color: var(--text);
+  font-size: 14px; font-weight: 600;
+}
+.opt:hover { background: var(--card-2); }
+.opt[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--card)); }
+.opt .opt-glyph { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--card-2); flex: 0 0 auto; }
+.opt .opt-glyph svg { width: 19px; height: 19px; }
+.opt small { display: block; color: var(--muted); font-size: 12px; font-weight: 500; margin-top: 1px; }
+.device-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.device-card {
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--card);
+  padding: 16px 14px 18px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  color: var(--text); font-weight: 650; font-size: 13.5px;
+}
+.device-card[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--card)); }
+.device-art { width: 74px; height: 96px; border: 2px solid var(--line-strong); border-radius: 12px; display: grid; place-items: center; padding: 7px; }
+.device-art.pc { width: 108px; height: 74px; border-radius: 8px; }
+.device-art .screen { width: 100%; height: 100%; border-radius: 6px; background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 35%, var(--card-3)), var(--card-2)); }
+.device-note { font-size: 11.5px; color: var(--muted-2); text-align: center; }
+
+/* ---------- real brand marks ---------- */
+.brand-img { display: block; object-fit: contain; border-radius: 6px; flex: 0 0 auto; }
+.brand-fallback {
+  width: 100%; height: 100%; display: grid; place-items: center;
+  font-size: 11px; font-weight: 800; color: var(--text);
+  background: var(--card-3); border-radius: 8px;
+}
+html[data-icons="mono"] .brand-img { filter: grayscale(1) brightness(1.8); opacity: .92; }
+html[data-theme="day"][data-icons="mono"] .brand-img,
+html[data-theme="sepia"][data-icons="mono"] .brand-img { filter: grayscale(1) brightness(.45); }
+
+.engine-badge { background: transparent !important; box-shadow: none; padding: 0; }
+.engine-badge img { border-radius: 8px; }
+
+.engine-strip { display: flex; gap: 8px; overflow-x: auto; padding: 0 2px 2px; scrollbar-width: none; }
+.engine-strip::-webkit-scrollbar { display: none; }
+.engine-chip {
+  flex: 0 0 auto; width: 42px; height: 42px; display: grid; place-items: center;
+  border: 1px solid var(--line); background: var(--card); border-radius: 12px;
+  transition: border-color .15s ease, background .15s ease;
+}
+.engine-chip:hover { background: var(--card-2); }
+.engine-chip[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--card));
+}
+.engine-chip img { border-radius: 6px; }
+html[data-device="pc"] .engine-strip { flex-wrap: wrap; overflow: visible; }
+
+.ql-badge, .r-badge, .tab-tile .tile-badge { background: transparent; }
+.ql-badge img, .r-badge img { border-radius: 8px; }
+.ql-badge .brand-fallback, .r-badge .brand-fallback { width: 26px; height: 26px; }
+
+/* ---------- minimal surfaces ---------- */
+.card { box-shadow: none; }
+.searchpill { box-shadow: none; }
+.status-card { background: transparent; border-style: dashed; }
+.safety .shield-tile { border: 0; }
+
+/* ---------- search bar shapes ---------- */
+html[data-shape="rounded"] .searchpill { border-radius: var(--r-sm); }
+html[data-shape="square"] .searchpill { border-radius: 8px; }
+
+/* ---------- density ---------- */
+html[data-density="cozy"] { --pad: 14px; --gap: 10px; }
+html[data-density="spacious"] { --pad: 24px; --gap: 18px; }
+
+html.no-anim *, html.no-anim *::before, html.no-anim *::after { transition: none !important; animation: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+  <div class="boot" id="boot">
+    <img src="icon.svg" alt="" class="boot-icon" onerror="this.style.display='none'">
+    <div class="boot-name">Titanium</div>
+    <div class="boot-sub">Metal for the web</div>
+  </div>
+
+  <!-- ============ ONBOARDING ============ -->
+  <div class="onboard" id="onboard" hidden>
+    <div class="onboard-shell">
+      <div class="onboard-top">
+        <div class="brand"><span class="brand-mark">Ti</span> Titanium</div>
+        <button class="ghost-btn" id="skipOnboard">Skip setup</button>
+      </div>
+      <div class="progress" id="progress"></div>
+      <div class="onboard-body" id="onboardBody"></div>
+      <div class="onboard-foot">
+        <button class="ghost-btn" id="onboardBack">Back</button>
+        <button class="primary-btn" id="onboardNext">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div class="app" id="app" hidden>
+    <header class="topbar" id="topbar">
+      <button class="icon-btn" id="homeBtn" aria-label="Home" title="Home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.6 12 4l8 6.6M6.4 9.4V20h11.2V9.4" /></svg>
+      </button>
+      <div class="tabstrip" id="tabstrip" role="tablist" aria-label="Tabs"></div>
+      <button class="icon-btn" id="newTabBtn" aria-label="New tab" title="New tab (Ctrl+T)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      </button>
+      <button class="count-chip" id="tabCountBtn" aria-label="Tab switcher" title="All tabs">1</button>
+      <button class="icon-btn" id="menuBtn" aria-label="Menu" title="Menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </header>
+
+    <main class="stage">
+      <section class="home" id="homeView">
+        <div class="home-head">
+          <div class="hello" id="hello">Good evening</div>
+          <button class="plan-pill" id="planPill">Free</button>
+        </div>
+
+        <form class="searchpill" id="searchForm" autocomplete="off">
+          <span class="engine-badge" id="engineBadge">D</span>
+          <input id="searchInput" type="text" inputmode="search" enterkeyhint="go"
+                 placeholder="Search DuckDuckGo or type URL" aria-label="Search or enter address">
+          <button type="button" class="mic" id="micBtn" aria-label="Voice search" title="Voice search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+          </button>
+        </form>
+        <div class="suggest" id="suggest" hidden></div>
+
+        <div class="engine-strip" id="engineStrip" aria-label="Search engines"></div>
+
+        <div class="homegrid">
+          <button class="card addnew" id="addShortcutBtn">
+            <span class="plus-tile">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+            <span class="addnew-label">Add new</span>
+          </button>
+
+          <div class="card safety" id="safetyCard">
+            <div class="card-kicker">Safety Check</div>
+            <div class="safety-row">
+              <span class="shield-tile">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 19 6v6.1c0 4.3-3 7.6-7 8.9-4-1.3-7-4.6-7-8.9V6l7-2.8Z"/></svg>
+              </span>
+              <div class="safety-copy">
+                <h3 id="safetyTitle">Turn on Safe Browsing</h3>
+                <p id="safetyText">Get protection against dangerous sites</p>
+              </div>
+            </div>
+            <button class="accent-btn" id="safetyBtn">Go to settings</button>
+          </div>
+        </div>
+
+        <div class="quicklinks" id="quicklinks"></div>
+
+        <div class="card status-card" id="statusCard">
+          <div class="status-item"><span class="dot" id="dotVpn"></span><div><b id="vpnStatus">VPN off</b><small id="vpnSub">No tunnel active</small></div></div>
+          <div class="status-item"><span class="dot" id="dotBlock"></span><div><b id="blockStatus">Ad block on</b><small id="blockSub">Balanced filtering</small></div></div>
+          <div class="status-item"><span class="dot" id="dotHist"></span><div><b id="histStatus">History on</b><small id="histSub">Kept 7 days</small></div></div>
+        </div>
+
+        <div class="recent" id="recent"></div>
+      </section>
+
+      <section class="page" id="pageView" hidden>
+        <form class="addressbar" id="addressForm" autocomplete="off">
+          <button type="button" class="addr-btn" id="backBtn" aria-label="Back">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>
+          </button>
+          <span class="lock" id="lockIcon" title="Connection info">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8.5 10V8a3.5 3.5 0 0 1 7 0v2"/></svg>
+          </span>
+          <input id="addressInput" type="text" inputmode="url" enterkeyhint="go" aria-label="Address">
+          <button type="button" class="addr-btn" id="reloadBtn" aria-label="Reload">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.4-5.3M19 4v5h-5"/></svg>
+          </button>
+        </form>
+        <div class="frame-wrap" id="frameWrap">
+          <iframe id="frame" title="Page" referrerpolicy="no-referrer"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+          <div class="frame-fallback" id="frameFallback" hidden>
+            <div class="ff-inner">
+              <span class="ff-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10M12 18h.01"/><rect x="3" y="3" width="18" height="18" rx="5"/></svg>
+              </span>
+              <h3>This site won't load inside Titanium</h3>
+              <p id="ffSite">The site blocks embedding with a security header (X-Frame-Options or CSP). A single-file browser can't bypass it — your normal Chrome install can open it.</p>
+              <div class="ff-actions">
+                <button class="primary-btn" id="ffOpen">Open in system browser</button>
+                <button class="ghost-btn" id="ffCopy">Copy link</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ SHEET (settings, panels) ============ -->
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet-shell">
+      <header class="sheet-head">
+        <button class="icon-btn" id="sheetBack" aria-label="Back">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>
+        </button>
+        <h2 id="sheetTitle">Settings</h2>
+        <button class="icon-btn" id="sheetClose" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+      <div class="sheet-body" id="sheetBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card" id="modalCard"></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>'use strict';
+/* ============================================================
+   Titanium — brand marks
+   Real service icons (64 px favicons), embedded as data URIs so
+   the browser still works offline and makes zero requests for
+   chrome. Trademarks belong to their owners; these marks are
+   used only to identify the search engine or site.
+   Regenerate with: node tools/fetch-icons.mjs
+   ============================================================ */
+
+const BRAND = {
+  duckduckgo: { name: "DuckDuckGo", color: '#de5833', domain: 'duckduckgo.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAk1BMVEXeWDLdUiv/zjbxyb/dTyTcShpIuTn////eVS/+/PvgXzv87ururZ3uuq7ibkveZ0Dnh2/59fT32NDpmIXsoI776OPywrbpkXvqqJjlfGH4tTXp7u3U1uHv4N1QrDP+xi/qgTKRjDP0pTL/9tq/4rtFXJub0JCbpsdpwF2wuNLukDPdkH3/5qD/2W94h7O0tIXdzr9VMXMLAAAE7UlEQVRYhe1XaXPjNgwlIzK8RJEidTryGce5dtv8/19XUBJlycduOv3SzhQzcTIO8QA8gACI2D8U9D/AfQChtG8zhDHK2iJRQvwtAOWajFJKuARBBP40hcu/DaASC8qZLVJdJUmlU28NoaSu1LcARGURlbV25SwcV9WSIptcB3IFoOAkLtbBXwe2vS8a7UAvL1NCjL1y4hIgkZhbsC2S2kiEOAhCUva2lUdEJr8EECnGLRxRKaIYNKNwTKUHWNcSrsV9gLxBpCiZ0gbUZ/o9BkFAYukJSvN7AKIhpBHM1Ry11mbAxRICWxfO8FTcAdCIwP90Brb9WpXrypKlGzzTECX4cBsg4cF+ikCJ68El1144AbrgA05uAShJCsZSCuewr1IdKk8wz5dkUEAosFTXAMKStoQoesFQvdlX3ufFG77wQbOyxbW4AkgMcsxlPEbbJPlwSCTtAiFzEKysLgFKSzxTdjyK/XrG9AQ7/K9WzNKpJCNAhYhi1UgZLZY3r1wyCUFglCwB8hrYKdFgCX8uig1aQUPmAEaxYnJhBHBElsyT8cCa5V33FPW719duQSRJ2VpSNwcQBa1zIUcHfC7e37t1BIBwnvTCBSTA42YBYEjFEjoe0EJ0bCnrBQs0YZpkYgagqHHMjhRe3VjRdapdJgIyQ9UMIAFOYgQ8+wpfda+RBPb68t4V85rmBtJO9QygoF44iWYA3cvLaz4BvHQjCaMf0gWVGUALxGp0AfASAZ5e31lCQnuSJtLEUtLOADL4pokOmq/QAt//eJ/zkHDMs4/Dajf4EOxlMwAEtV1EmmTftMRIgXjupdodVquHh4ehqrlnlUQzAAzM+wiAz11P/PgJSuHnYRs+Hj7GMH3ovvcASBP5fx7VBtluD7EgrwBCCGcPbCzCH1tA2K4GOXxkU6PmxUUIGdywdMryUAgQQPB9u0N9CfB5n+bNBYkhjdW5UCIAePCwNRf9/WYaPS1YLCQgQeeRA5CVwRiscxx+xUQ5EVTOAJrCOJtM4c+BRcF+AHMAcfjY7T4Oh9V2rAIuhbI0mQEoCp2ujuXOs8gie/45T0PMArbMmcVlEhnR5+uMSHeuhOcVWAaBNOziVQDjFTHz68ya0FDQVAn63BNzg8wOJDNTFiACaCjFAsBRuQZiL0gYokOBwPl4gf5dSrJoadDQgVQ1FZp5mmLIx69mRYBKGGB1vgBgCcIwl6Y0fU0x5KFRcbPfnJNUMQWzni0BwAUL6008FK6DeAqzSYQK3W8eH/fRAWjonlwNFqhtnkwziAcSjm+n0/HpeNrv948gm5hjmIDITH3zPFxrfB6uvIXR9hbU3vrPGUA/XIm9Hq4w3jFkph/vYKbKB4DN4ySh1HkY757cGu/AI54WjJ6EwfZm+pDTgsFvLhiwXJxXHP65ZqcIsNnsNxsIgccVR7PbACLtlxxnoWzaL3EMdk/H0/FPKEZgEvH6N0sWy8EHWAcVzHqjcwFmj+GsykItUqNhzSt+teaBD5qTFmq09BxIOJ7Giq5BHaVAXNJinP5i0QxMSoI8HBXr2Y5SyjqsuqXF+DerbvAXVnuSllePg3xdwL5b/3bZDktVv+5XTs1ccLpf96tvrPvheFXD+8JYHx8chc1g77PJ9x4cvb+uMOHJA4u+GZ48WeNuqd9/dAmhkiI+urxW995c/+Z3438H4C/TvYWu7cWdmwAAAABJRU5ErkJggg==' },
+  google: { name: "Google", color: '#4285f4', domain: 'google.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAApVBMVEVHcEz4+Pj8/Pz9/f38/Pz59/by8/Pz8/T7+/v9/f309PX29/fy8vP29/f///84qlfsUENHiPT8wBLrTD88rFpJivNEhvUqp006g/T7/PvT4P3rRjjqPSzg8Ojva1uWz6T7ugWWt/j4xcH+78jA4slxv4T85eTtW0v61tRctGaDrPdSj/YtffRmmvb1p6L+3I790mKuuUHykIg+nZ3G2Pv0lCs8o3o82clfAAAADnRSTlMAoetQ0/wdM7c/jGYSeQFEN8MAAAMjSURBVFiF5VdZm6IwEBQURBFQRGOGwxOvUWd0dvf//7QNEpLOAeLDPm09+QFV6erudGKn888wsgeeYTiOYXgD+2227TqmD2A67jsi3Z6vgdNtSXdNHf0ZRxuJgXb1Cr3BK77RRC9gNNLtxuVpEA3ZHLymF6i10W3H9/2aXKp8a38k2FvtFPrSR/tbNp7GSRLH4+y2l172Vf4IC19sDkk8HRNMCeI4OWyE13ikCAj532Qlu1IgSLIj/KIn8z349sHphE8l4uQBv/EkAzB1WTwGmDIkGbQpmnBA8g5Tkc4kEiEPTk0FLJk/1fPFSoAAMmA/TsZZdiCV1PFhCDZ/emP+ieWNRUzj/SYjEgrf9/mmGPIEMH6cgeY5Zhq+P2QCbILgRyWQ3IRv8VFmE5iqg+2KplDi16Dy4LInX2H4bIL40UDjcJUahAS/SeEPuIHG4cgp2K4KhdVBlzEdTHkffj0FwhVs2Q8FKXuH5Tb8LgXCb7DKZSHhcuYvy2bkkzCk2AKBxYxjUmB+fSmwahb45AbL8dptKzApBWZcoPuehUlNBG0tTCoBXxIAVaACX0DgMmegCkoS+TijfRDegcB5XeFcKixAGelYqw4OXHZieEepLwD7he31orSwZs8t2spsouOnQBQEua/BtYzg8sGeVLOdzxOShHtEgHYq/xcNYMZPumq08yxuV/egEIiCVObjTzUFbKyywuJTyScuZIVrGcBkwR1gNtL4tWSHIqqAlpCe0vWFncAvK+BYyGkIJA+nHXWL0xz9zJUUwoOBn6wWEyBBRPmSID8hFAR/ZnMpA/B8BXcLZuKZCVQgKEEUFmAfiLeMHlQIGD8gP4OIChAbk1QfgHi9ogqBjAj9gATIVy1wOvpphBR2EUEES+t0JHBzpPNzVQGhJZz1WOZ3+sJRQAqHRHoudBbW3LKESw6RWJ4Qw2kpNaan8uGeqjR2yyd2ysYY6vj6izbWHXK1F+5hqyMR16xfwG2hgN16PqlF7b+VCqYm/2/YaAq/gu3USmCn3V8327A0Gtgy2v/zG7mOqIEtx1Uv6M3oe0bPtAjMnuG9ytz/jb8i8rQexpJ/GAAAAABJRU5ErkJggg==' },
+  brave: { name: "Brave Search", color: '#fb542b', domain: 'search.brave.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAS1BMVEVHcEz/NAD/////LgD/SgD/NAD/PAD/QQD/PwD/PwD/SgH/RQH/QAD/NAD/OAD/TgX/PAD/1sv/59//9PD/k3j/YDP/uKb/IQD/dlVRuZ7eAAAACnRSTlMAvv//1t51mhtAxlaWOQAAA79JREFUWIWdV9l26yAMbIKXmB3M9v9fetkNBKfp1UNP3aJhJIQ0/PzM7EDJcDTujVJ6TJfO/WFy7wHWrxFeCM0YUPr60n9BUwaUPr5DWOAdA7J+47/DAvDGgJL9k+e2QAiX8OOWASHrCgBYt5n/g0EGg6FbBiQYIB7iMYmcJXfYM/C+I0C0t2zsLAAEDMQxzu4UEK39ljQCeFcLMoM3Dn7/zABpo5yG3gFrJZ7ehNLUe3DtlEHZfUQI+xcA73RKIYwR5zPbGb6E9N/Ge0YIC+w+BeDm+dGMLQxAC/AqAFx99n8+XUGwXVnmHCB3/gZw6lkOfrYEQOVv/s+nzBT6YsoMTMyYiCnssGRMo4h5NSmCrhJSDnBMgAyHRok/xJLP0yhNbDAdUM+chjYHeyKQE3AqxznCnMDIQnBfSh7UqfJ/+xZDjABfJ3gKRSjGMBUS5hRYdZXFUwUE22TxiAR0n0EDefqL1AT11SFRpHAMAOMRGuoSHUeG6pI61uLRhwAT4WYZzFWl4HC6qRzbQkhJ1D0FAUxZ30OfOJ5jW8opBtRnQYP8KazugKEdUlDvAmoXCgDKr7ajwGy6jrNKbO7CqXmFg+SKTmo760m5kjxCTRTl9XdHQD2H4m/7Bn3UflA4MHxdbUUIy7x8Geee1A+6Y8kA+UIEJ85MqkTDiM1/dcXdrsOUegSACEHzWqFDG9UsLNc5ic7eNdXcldNYyKulsqGlY2rLLRKgtnU7zpajMmgqUjiCMXC1OkQdLGMKvF0MmjtxKkqbLnk6UBiA0T8kAU76snPtl6k5eJ9tW2HQ9UXJuvIWtjB4H69HYUCaKyURp7D9rgze5c5rKQyuuvftEWPacDCFwVgF6SATgyuJBvAw3WmtYz8TMoOZ0NjKeEcp79KFXohDR+X5JFWtg5nCeFWBQZSUvgQ4YWE8C8UAsU5IGeowM5j4+0qoAgMz7XenSpaSDDNZI1AFBpkC7LAGgRBnqsn+qaD3viTOXGttxT0AuKGPSkcaiTPXrK/l0kjvY16BS2TNDjHYcjHwQqFr0WfwrwwmGq2LIao0ipogBAWtzJvKxJ8g0ludiFm9VQaSTubdyvbmFAICSGGcytJOJ94r5q1Xqih22FOTTmjeR3CdQxWqVAvByKBU786gZgE1UjfojFHqfny4bD2Dmdi+D6DhcC/3ya8Pp9fjE8BXj579/r3w8cHSkFjmDD6lf0DYZwz2r/1/wrAdGSx/eLheJCrA37bPJNYL4PtX70AiA/zH9pnEEvz/Gn1n+7pun7f/BwTDX8HxieBVAAAAAElFTkSuQmCC' },
+  ecosia: { name: "Ecosia", color: '#1f8a4c', domain: 'ecosia.org', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAALVBMVEXX64AtMxUXHAHA0XFZYjG1xmsgJgyQnlQ0OxpGTiZ+iklteD6ouGMOEwAAAAAI8kTaAAABxElEQVRYhe2Wy3rEIAiFIxq8xPT9H7dJxsyMCAy2my56tgn/hyB4luVff1z+1I+DY3AIAOhyWefD14DobiHkWcQGrtcepuIzOip0E8VIY/yJMBMCG3/IGL/S8z9T2GyALMQ7B6ZDeCmBIwVTK4pUAWsKQY53UA2A9m8YdJ6hGAC7lCwYAaABjkb6WvVKqIDow46wZw2hAdw9JFo7tBq8lGQAmgAgL4hsAmAUARuaAHJDow0gZ+A7gDRZSg2Wrga7AOC7UENOYb2KcAO+8BKN508QrnwhvWcQH0oEkLn4bhWTItIEuIu4dXmqAOQqSFapAkB+lMgmuwGYLr3HC1eI7GKljceLG8bV5h0PaG2krYThGB55QHyp/4M2QgK8qa8yfSOmAUMKQg1kAH0jhC4oAHKbNv4e2I9Q1ZvIAIaBTnOAcaDVYRoB40bpfQHWlar7vjMbJfYEoOoSZCeqyN6ESLIqVgKIbqtmAwKT5ntjBsUjOURuF/Q6XPpRwG4FtIUAe9qiza76tcZYSnnEp3Iq1nnT32Zc8QIf1JaQ3WVTFdFsGNXGAy32klVbMiZ3yOpuI/uUWvS8lr8FaHZE03NDKIZoWb4BAmwNzfsrBPYAAAAASUVORK5CYII=' },
+  bing: { name: "Bing", color: '#00897b', domain: 'bing.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABuklEQVRYhe2WsXXCMBCG/xMNpbIBmSB0aa0wQDJBkgmINrDZwDgLQCZIBuDJKdN5gzCCShrrUhiwCNiI95wq/quz/XP3cZLOBnr1+u+iUKPUJoIrHwBxD2C0vV2AuACJmU3V+k8ApDYSjBjMuj0Tp1sQ2xmA1EbCuRygm8B8BQSpSyBE61NGfFCckUOQgqArm90RBCkAS+8XY7CLQ4sDLR2Q2ozg+Nujmdlskpz0TlcJQHXhqgt5CEBzB1xZFyNaNBUHAJtNEjDqgs49hBRvB4CoW08HbT6tAc3qC7rvAADjXRDYzsKLR10A7CW1kec8lx6/EIC1F4+bTDtJbSLvsmjyXQDAH/uw5PNHy5XP+5ioAwAh3uuEiOTUNEJUz8ST5581eX+rfRJOVylAL7WbFyCxtKnKt/tijJJjEKK9h5Hb1zvVDYA2Eo4NAvbAr7SJzVRQF1pPgU2VrcYtz89m8gcROGlbsmCAHYTNJhqCrlHNfX+DrQGeQ5Cq2s7evw6DCP4eCNXRe+HMcgy6Bth8veXD20cCKNreioa3z9h8LT9P+YMm4aWqXlyHy9Hk/ROAYwgOngu9ev0//QDmCZ48wX3K8AAAAABJRU5ErkJggg==' },
+  yahoo: { name: "Yahoo", color: '#6001d2', domain: 'search.yahoo.com', src: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBEQACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAADBQQGBwIBAP/EAC4QAAEDAwIFAgUFAQAAAAAAAAECAwQABREGIRIxUWFxIkEHEzKBoRRCkbHBI//EABoBAAIDAQEAAAAAAAAAAAAAAAECAAMEBQb/xAApEQACAQMDBAEDBQAAAAAAAAAAAQIDBBEFITESEyJRMkFx8BVhkcHR/9oADAMBAAIRAxEAPwCLXvhj4nFEgNRqBQInOcb46VMoYEpQPvTcDIEo1BgalUwyBFVQZIeE4qsyA1KqPgKLfpXTMVyEq8X1XDDRlSG1HAUB+49u1cW+v6kZ9i35Jn0S3dfWiGr5MC0cTCdgQEpB8CqY6RcTXVUqbh6GEMTTut4zqoCBEuLac4ACVDyBsR3qvuXenTXc8ofn8E3iZpPjvQZj0SQkpdZUUrFekpVI1YKceGXR3IilVYOkCUqiNgeqNVGMEtWx3xRwMjQficsw7RbLfHymPncDkeEAAfnNee0VKpWnVlz/AKCK3M1UqvRYLUhjpSY7E1Jb3WSeIvBBA/cFbEVmvqcaltNS9Ea8WOfi2whnUzTiBhTsVKl+QVD/AD8Vi0OTds4v6MlLgo6lV2S5AVKqDJD1SqrMYJZByDyo8bjYNKQlrXek2mUOoRcoeM59lYxv2UK8y3LTbtt/FifFmfzbBeIb5Zetskqzj0NFQPgjnXep3lvOPUprBami36B0XMauDV0uzZZSyeJllX1FXUj2FcjVNSpum6NJ5zyxZz2wiufEx2W5qyQZjRaSEpSwDyUge4+5Nb9IjBWq6Xn39yykvEqKlV0y5IGVUQpDxSqrMmAalYNQbB3CuEq3S0yoLymXkclJ9x07jtSVaUKseiosoOM8lrY+KF3ba4XYsV1ePr3T+K5UtDoN7SaF7MRJd9bX25OtrclFhLSwtDbHpAI5Z61rt9MtqMWks5LI04osknU9j1RpR5GoAGLjFT6C2PUtR5FHk8xXOhZXFndJ0N4tiKEoy8eDLyrIz1/FehNKQMqojDxSqrMYNSqI6BFWx/n7UQrcmyLTJZsUe8LU3+mfdLSQD6gRnOf4rPC6hKs6K5QVJZwKVK2yOQOM+1af2HArWMZPLOPvRGGUqxS4+nmL2+ppEd935bSCr1q5746bGs8bmMq7oLlckjJOTj6EilVpLR6pVJwYy2/Dxxq4OztPzUKXFmt8eAPpUn+tq5GqqVJQuIPeP9iVNvJFja1fbpTksMXSNbVsS0p43msh6OnbCfO/jpXOlp1WCi5Qcsr6PhsHRIMdX2pqVGQzc4padnu/qOIg4bKVYPbfFJ+n3Di24PKisffIO3L0QGtSadatnC3cIrdubadakW75OVyHCdlJ7e+e9XSsrrubwfVlYlnhDdE8gJWpNPO6ecbNwjJtrkIMItnyP+jT2+VnxnOe1PCzuo10+h9Sllyzs16GUJqXG5TNfXVmQ9CtlvmMybdAZSllbKeFJJG+ep25jrXT02g4xlVnHEpPcvowazJ8sqRNdIvHijSGQ9YmSIjhXEfcZWU4Km1cJPahOnCfzWQ9KZDUfYcuVMOkDUdiOvOiMCUfGamBgSlHGKIyOCevOoE8qBP/2Q==' },
+  startpage: { name: "Startpage", color: '#4b6bfb', domain: 'startpage.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAb1BMVEX///9cifb3+Ppicv/4/P3t8PgHGjofK0UXJUEj3c1gfvtRWWyX6+XY3fI3QllFseTO0Na5vMTO6Pje+fhfnPGhuPs9x9pgaHonM0ybn6nm6OqQo/2rr7e5zfps5dyAhpNMoupyeIiKj5sAAzB7gpFTBbwsAAABV0lEQVRYhe2VXbOCIBCG0WChRFM0v1JL6///xljylF2dWZo5N4fnqm3mfYRdRMYCgUDgL4jjmPunhRlPllT4OWJzqqLosNvtzqPwyJf6eLxefxQpPT/V9cYQkQ16X6Ph6AxWERF3ofeWujaccXE6oOFMypcTCvRaGbcN0hIM5qdXOaKBtAS3g/JVijM2gpAvneBd87Gqqogg4HrSWm/+KI1JSYPk5efpjRGKABHvtoslsVDC+Zxk7fIupVKQkQQJKCWLteoTJSUMFIFYbES1g4h5LKzNFqQFMJbiQyUk3dDNgD/b4vfQB0WGMQXg4lJm5NexaJ/JFTWTL5W0UfDMAjgDVcBEfs9ut5tqig4N0JENjLsTyJm4gE8fN/QNjjXL/Q05jlU19Lv1hRurmnt/w9DiRIYvvlOLbSRcfD4xK6IBBR35VtjQ37PLFz1geCy+6EAgEPgPPADiJxHKtbu2KgAAAABJRU5ErkJggg==' },
+  qwant: { name: "Qwant", color: '#5c97ff', domain: 'qwant.com', src: 'data:image/png;base64,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' },
+  mojeek: { name: "Mojeek", color: '#ef7d1a', domain: 'mojeek.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///96uzt0uDJ2uTV1uTTZ7Mdxty7v9+d/vkKs1YSv1onm8trc7sydzW7y+exttSeOxVi63JmFwUv3+/PH462TyF+12ZK93p2j0Hfg79GYy2jR6Lz7/fmLxFOx14zr9eLD4aaEkKP9AAABAUlEQVQ4jeWQW6KDMAhEA0SS+Kra+ra1+1/lxYja3i2UH0/IBMYx5mcq64ciHY3J02kKmTQSgWE+rl1BjMjUB8vWMuSuQGkgpyooPREBACKAfKlpBLbiY0Z3q9rYQe+tKEgBp2PHvCzP7W3tXNheK1Bzv3xWBPyK++AE8uV5f29kwvoPPiesoq/iOoFWwbbXhlGMDTES8VZEODp7zQgYfzsRCArRi9aDgfsI+AHvS1CL4KGAJ8yXIMgxiYBgD6DxEhSST/YFw7egteDdDhqPKKkdwpHTU1JZNJ7nBiZliZy9RuWIbzGn1SpIMkiWOd8FZV130XvZKUgQUzW9ksX8SP0B9Z8MkKwlFaMAAAAASUVORK5CYII=' },
+  swisscows: { name: "Swisscows", color: '#0a86b8', domain: 'swisscows.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAUVBMVEVHcEwAAAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAACVlZXs7OxGRkb4+Pijo6Pe3t4lJSUVFRUzMzN1dXXLy8tmZmbAwMDT09NUVFSDg4OysrI2zVhmAAAACnRSTlMA6///uCD0rAlPpiE3KAAAAjVJREFUWIW9l+l2gyAQhS3YNGHfBOH9H7SYqHUBXDin81fux3BnAGma5vlqv+CN+GpfzybG988d9Sd+vuP8FfpIeDavGj2Er6YqAQjb5pZ/f/Fo6vQQ/gtAalIHQEgqGTmqF7cAMpjgmEfMUX0H0DMOxsDdDYCa5QC4/gZAYIxHPUW3PCB6yiFIqNF1ANSj3sT5OQiXAZJ99HZgUUA3Rp5YwscCqgnpEd8V4hgwJgAsc9zL3edDQE+nEniWaIMFQCCk9t+7uQ1sl9wRM2Dwiu3qjKYeAIAnmmAJEC44vu00/acH1JcBUEgRNoskizaOBI4pxazPASLCr1epDNjG4Ci1WskkgHSrZaqw02MdXECWYp0EdHpR5h7t5wccvZV9n86g83MGi0NgE2xtwRqARg8UysmjAyQPIPZThc7RpNYg7R0weYA07/xIenrcDY2qPPZZAEQgnhc6k/50lCCusoB55yWCT2OUY3kAJD5VvWEB8xARrMoDhgE2ITcL71VXBsAOb+U2caEUAHLtRGz99EbOAiBxK8DuJD8EQL9qJFu4m3Nn4qoS25vgIoCyYgJHAENZoQJZgJpcpKTsYA4wdwLbXySnAEMj8Hiiu8RFcQoQmxkTGWILorKDhQzM0A0Uc8wPEElA//4NkEKI2NYmNeIAAB2Yj53UhXoMMCDxO3UFEMCheWUAwqUdfALgXSWgOgNb64E1J5q4BLgQ9YDqR1dbB2jrH57VT9/qx/f7+f+4o368n/+/IWZAg+NNZZcAAAAASUVORK5CYII=' },
+  presearch: { name: "Presearch", color: '#1f7dff', domain: 'presearch.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABNElEQVQ4jZ3SPS8EURTG8d+wIUGzhGa9JQqNQqdXakWi1qrQ+QIKiZpeR3wAkahUolav2EhIvGxYwdpRzL0yGbvFepKTzD1z7j9Pzn2S5ePvW1T8T7VSuNxCFY+FgSRUXinKmEalFJpVrOAdfbnhDzzgCz2h18IMTjAVAU9oYD+QWznAOXZwkwNX8QIRkIbvCiYLlmcxgjW8Fv792irqCls4DeclLLQb7AS4TpJkD4fB3SDG2w2W2jUxl6bpNhZlr/CG224A86GiznDZDaCOO9krXGAX9VQqKcSiE+AUmxjAM5oYDZebcrvrBHjDGA5kC0xDv0eWgY3Yi4AkkG9kSbxHL4aCCznAQDsH5TC8jn5ZYBpY9fepP8NsOQ+YxpEs0nFLSc56VDwPYyICarIIT4XqRrUfP/xFNjRiP+gAAAAASUVORK5CYII=' },
+  searxng: { name: "SearXNG", color: '#5a7d8c', domain: 'searx.be', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsSAAALEgHS3X78AAACiElEQVQ4EaVTzU8TURCf2tJuS7tQtlRb6UKBIkQwkRRSEzkQgyEc6lkOKgcOph78Y+CgjXjDs2i44FXY9AMTlQRUELZapVlouy3d7kKtb0Zr0MSLTvL2zb75eL838xtTvV6H/xELBptMJojeXLCXyobnyog4YhzXYvmCFi6qVSfaeRdXdrfaU1areV5KykmX06rcvzumjY/1ggkR3Jh+bNf1mr8v1D5bLuvR3qDgFbvbBJYIrE1mCIoCrKxsHuzK+Rzvsi29+6DEbTZz9unijEYI8ObBgXOzlcrx9OAlXyDYKUCzwwrDQx1wVDGg089Dt+gR3mxmhcUnaWeoxwMbm/vzDFzmDEKMMNhquRqduT1KwXiGt0vre6iSeAUHNDE0d26NBtAXY9BACQyjFusKuL2Ry+IPb/Y9ZglwuVscdHaknUChqLF/O4jn3V5dP4mhgRJgwSYm+gV0Oi3XrvYB30yvhGa7BS70eGFHPoTJyQHhMK+F0ZesRVVznvXw5Ixv7/C10moEo6OZXbWvlFAF9FVZDOqEABUMRIkMd8GnLwVWg9/RkJF9sA4oDfYQAuzzjqzwvnaRUFxn/X2ZlmGLXAE7AL52B4xHgqAUqrC1nSNuoJkQtLkdqReszz/9aRvq90NOKdOS1nch8TpL555WDp49f3uAMXhACRjD5j4ykuCtf5PP7Fm1b0DIsl/VHGezzP1KwOiZQobFF9YyjSRYQETRENSlVzI8iK9mWlzckpSSCQHVALmN9Az1euDho9Xo8vKGd2rqooA8yBcrwHgCqYR0kMkWci08t/R+W4ljDCanWTg9TJGwGNaNk3vYZ7VUdeKsYJGFNkfSzjXNrSX20s4/h6kB81/271ghG17l+rPTAAAAAElFTkSuQmCC' },
+  yandex: { name: "Yandex", color: '#fc3f1d', domain: 'yandex.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX4YEr////4XEX4WkL6opj4Xkj5iHj+7On/9/b6koT4ZE7+5+T4Vj76oZT4aFP4WED+8e/6joH7raP6l4v6m475gHD8vbX8yMD4dWL929b8z8r8w7z4bFj+4t791tH7qaD5emn7tKrvNQx4AAABjUlEQVRYhe2WW5eCIBSFiTyKl0pLjUq7/P8/OcrGMJcNUC+z1rifFA/Hj832wtiiRYtmxSF6d8E6vwp7VdtJB2L6gq3Drs6jTulmN2kctv14vl/bCMKV0jl5QSB+xHhoI6DkogpF+VLJi1wNX6dLm0EoBBCacSntAXCwmsioOQOhGNWSbAEgrQCMrW+4Wc1MMS8x9rADmLsJswZKTmootW6i0k6v95E9ASoNlf02zyAkKeqfjmcAyKUTQFc/QSCJ8+tMwOcRtpiQahuzGuduDqgZiJ1AnklG6rR1c2DMfFIuDACx7TEYNSDMETdutjVKHB3oxUOTZ77BceAxv7PxOOSZmiscvTtbqBACofPMYxxdfFbQP1LIjpAMduSxF0CXZ41w5OWmV8G8APo8tzrPayXXEBplDzS4ucdngtBgDamfeWOE+luEBA3a5lMEDhfy0nMDTYNKR8h3BwcNeT65vIpnpd/PkfVr9LZBgDgf3F8Esw1W5bcNgqXBv25AMlb6+Fno/s3e/HQuWvTn9AM1BhBJZB5LTwAAAABJRU5ErkJggg==' },
+  baidu: { name: "Baidu", color: '#2932e1', domain: 'baidu.com', src: 'data:image/png;base64,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' },
+  kagi: { name: "Kagi", color: '#ffb319', domain: 'kagi.com', src: 'data:image/png;base64,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' },
+  wikipedia: { name: "Wikipedia", color: '#c8cdd6', domain: 'wikipedia.org', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX///8AAAAzMzMwMDAtLS0eHh4oKCj6+voYGBgaGhrR0dFbW1s9PT3z8/NPT09WVlYQEBDo6OhjY2Pf3995eXnExMRtbW1FRUWXl5doaGi+vr6zs7OdnZ3Z2dkjIyOQkJCEhISmpqYcB05TAAABn0lEQVRYhe2UyWKEIAyG2XFDUdxm3Mb3f8mCgJ0e6mBPPfBd/AUTEpIIQCQSiUT+Kz1kQ5WXhYRqhHjQisJlg6zMhxRmoxbVIGH9uwOuNkkIpqMAvO4pIWwy6sHY+jyWGMGduA5ioog0VjYEl4dQCbGn1klycTzwZt7BItGqjOjgblcU3D7agyxBVFn5IKw1z3xwe3P6If6DArOX85UiqUNeYGffedEG2JtbkNzKhhhfee52OqhCHAiEV5dzl2IiMpi5nbwMsQdgY3hwIeh0xsoHoHwqn6glou5TnQ5OFu8Y8TAHppKVVbzApHerYp0D7XXqSLrr2tcznQmG1NBSnpUUuivcjYbV8DyX2OP2BGF8qAUuVyY/4bqJj3MFeyFEJyP7/NrmJy3DyDxnaaQpv5DPOw4UPSrJ4WSKmmo50zv2uukIeejKF8BPNQ2uoeVJUaqENP20UJRknQyvoWVFbBsLH03/uFFDy7wiLO0U6b4iYXP4Tr2evzY9Ur6179Ay3856pGjgHL6TQT9FeqSK0Dl8p/n+AU/7H+wjkUjkJl+4BBLrIwrZsAAAAABJRU5ErkJggg==' },
+  youtube: { name: "YouTube", color: '#ff0000', domain: 'youtube.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAATlBMVEVHcEz/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/////EUb/ACL/RGP/7/P/q7n/hpn/zNX/3eP/Z34pvHLoAAAAD3RSTlMA6zaWxYZkrPTcSyF7D/rE87ViAAABdklEQVRYhe2W226DMAyGnaMJhCTtKLTv/6ILXYXQWicZvtkFv4SEhPwp+JQf4NSpf6VhkL21RiFq7ZwQIoS4KQQhnHNaIypjbS+H4Ve4Ryd2AbTC8wnCod+Fm5bQdxlm/EY4HP8ijMfjY2QeIMY1k5oRH3Suv+OcwA0gm8pPSUjoOfEx9mB5AEsX4dIEMKBIwPJ1rQMUIAlI6VZHIN0GGZCm+VpBaCDbYAVkxKMMcDVASkssHcKBqAFyKi40QkBXB6Q7nYoOSPYOkBEPitAIWP+DCUjL5zO0AshyAjnNewDdUKGpCoWW7hr6oDhUotqJ01zpxOIwpelWmSZdBtRXgi7tg3vDRsHCRpoLM7RJgSe/NYSvVxNvKwcLkgWIEiTZii3KN9PIuhv1yLudcxWBdzn2q8NgJKF7eqTjaezkj8s6/BP95lLxgMsIuHer0qImV8u7hEYrPxnmMRvm7Ji9N0apbJtfyu/KGO+zS842efy7ET91qqZvZj+d0TOLUpwAAAAASUVORK5CYII=' },
+  github: { name: "GitHub", color: '#cfd6e4', domain: 'github.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC' },
+  reddit: { name: "Reddit", color: '#ff4500', domain: 'reddit.com', src: 'data:image/png;base64,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' },
+  ycombinator: { name: "Hacker News", color: '#ff6600', domain: 'news.ycombinator.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAMAAABhEH5lAAAAPFBMVEX/ZgD/////+fX/vZL/7OD/bAv/9O3/jUL/v5X/p23/nFr/2L7/cBL/6dr/iDn/sHz/mFT/1Lf/3sn/oGHk31anAAAAQklEQVQYlWNgoDJgZWMBkuyMHEhinIxcDAzcTDzI6lh4GfgY+VG0CjAKCLKxohonxMIojGYDHyMvhq1MzNQTogIAANoJARPbxOAzAAAAAElFTkSuQmCC' },
+  mdnwebdocs: { name: "MDN", color: '#cfd6e4', domain: 'developer.mozilla.org', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEUVFBr///8AAAD5+Pm7uruBgYO/v78AAATQ0NAAAAfMzMwREBbCwsPz8/QAAAvl5ea1tLZsbG7d3d2YmJrr6+upqapQT1KgoKKSkpMkJClHRkoKCBF3d3liYmSIiIo1NTkeHSMuLTLnF9JGAAABtUlEQVRYhe3W246DIBAGYJy2aAGtrT3T4/u/5DIgMGTTOslm75xEqwS+xl8UhZhrrrn+sSBWbqp/N30Zr1z1jWqG1L1eNUoZqVTDEOyxcnVwm0y9YedOTet2DABw7GLrdsvYW2s0b1xgj2NvFIAHArBgAfaJnberAmjc2Y4JwOD/jQIasGngAphXUwBrvJ7qzQNCXo8CAONO9sADQl62BPx95QIhLwp0dwSOlgXEvCgAPU4MECxgzKu4BGjDMQsA6fMSBLBXPzE6JhDyogCcqjCQA8S8CmDjDhUTiHkRQF/QXNVMYMyLAHD2V6BZQMqLAmFiCBaQ8spAmBhnLhDzykCNB9VFswD9inllwD9Im3A7JoGcFwGw6cQFUl4J6PDdWF0tCyB5JQCW7rcdn4kpgOSVARzUMwGSVwTCGnHvmEDOKwJ+jYiDpgCaVwJwjTBMwD9IbewcgDeatzUTIHlFYEgTYxoo8opAWCMECyjyigA2PbjAhuQVgN6/YYVmAbrIawRMmtrTQJnXCJCJIcZ58hk4GWlyZ3s3Uh7cZp46dVlKqb5kUH5C2fhVpcsuH8fPNddcf6ofl3MSWQ4aPYYAAAAASUVORK5CYII=' },
+  googlemaps: { name: "Maps", color: '#34a853', domain: 'maps.google.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAABU1BMVEVHcEyub9cSvGOJm26x0zE0vWAevGQYuW34R0ye0zn6ZDYkv2QWsn9FxlhDh/bitCIMumYMuWcfnNfFxCzFujBZxlYZvGntX1jxcVH1VVwumdb5Yjzzqx1lfvnmezxCkdz5WTwsm9ILrp4imNeudrMJrpzdZHnT1CLzqCC+wy6yfL/8SjyOe9jIZ6Tyths5iffY1R8NprsIp7KwecrBbMTYYocMumYNu2IRvWAbv2ALuWs4hv0lwWL8RT47xmEwxGIxivkrj/MJt3gmlOsemeFFg/4PocoXndZHyF0GqbIGsJYIs4ZTgf0Kpb9Xy1m8a8r8UDlkfvrKZrnq0Bf5sxXZ1R9nzVGM0ELtUWrVYaYGrKShcuH7di78XjV5z0rE1Cn6pBr7aTLdXJXjWIXzS1z8mB39iiN0e/aQduvywBbzxxOCefHayyDoVXj9gCT0Uk9HcEwWu0aqAAAAcXRSTlMA/dEJ/hJjqP7+p0kifLAk7ofOZkXPuP6HxzM5w7AVamuOeLVsOifYmvpBw6W289a22MHDzcz/////////////////////////////////////////////////////////////////////////////APVNocMAAANhSURBVFiF3ZZnXxpBEIdP8MAICLGALbGXGEsqZ0AURcEuNgQFARWMCvL932Xmdu+4g1mKeZX8ecf6PDszu/tDSfqfs7D4AdIDmRhuG7YufL/5/fJ4enp4uLMTDAbDPcPWdvjpHyc3KHhUBaohvDLWMj6bOjs56TALwBCOtNjJ4F3q7AwFrIeqYHNzogXcOnR/l0qhwDSEIPKbkd7mkxhKckGHeYooiEQivU33f0iWwcCH8PJYI9jeblLDUBcX6D0YW0BBrGEN4111AjQY+O1YbFLMz3aB4CHJBCemIegFxGJR8Wl+DqGgXFanCGNcnMZvx3pWVIHGR7+K+JFQKIQVlO/UKU7PagvOsbAuiEajRzPCAkIhfQhLH41L8hR0oPFH38QF6IKl2tUpKAD5I8geXcK4QfCz7rStvdtcsLe3Rx9EnAkqyeT9/Wz9srPKX++TAuTj8Uql4isPUusTOk8KrCOhOH7A4PONUIKZKr/vINa742oyGZ+vm6xQmkIe8f0Du0iQgeRFArvGCwQqnMnn0+lxWmBj/AFEIMjnEU+naV6SWPkHB1tbpABgwF9fi8WPxDJEvua4QIB7I14skKcoSZPIIx4IkIJXRhcKuXlaYGfbBwK0YLDI8VxulBZ4+fYBv/89sewuMDp3cbHcT/EOvrvf71ec1B+oNOAXT09kCV4dVxSywtELpAF/KpWIEhwqjLSiWEhBH8efS6XSJ3ftqtOj7Q6xkQL3MsAQ4LOdtQan36/vr3jIEUAPiD+fn5ey2c53V33GJZvHwK9Sh6gGaOQvkb9NDNhk9rVssxhw0Qgx8+eYyywT7O4OeO0ul91u8SvGBhTqEvCt5gC/hAJAkEjsrm+s/VoFQOO5wyILBZIbebWDq8QxE6gGUwQTZOlDnnXABCaDepHoI9Ri/UILFI4HAt6GPGQOeZNALwF5+g6axjCHI7zlAhyCbkC+wQC1yLwALuAlMIWnpX8W++EMuGDDIACDh/o5oAxqB5pAawIELfJwmLcJGIEqWKsKBG+QjKNOAIqW98e4jusqEL8AgWF33VRBm7wkDRgE0EDzC1Qb64ChgoYvUBSZCdhdbPgCRXHwCsDQ1gFU49VaaPoCRVnnFbyVl1ysAtebBbIFBW85AS02FLTxBAiD1/tX/D+RP8WsZ1QDZH1FAAAAAElFTkSuQmCC' },
+  x: { name: "X", color: '#cfd6e4', domain: 'x.com', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEUAAAD////X19fT09NdXV3c3NyCgoL7+/vExMTt7e2ysrLp6en19fV2dnYXFxfi4uKjo6O4uLg5OTkfHx+Tk5Orq6vNzc1TU1MuLi6MjIxFRUVpaWmamppKSkonJydvb28PDw8Fgb+oAAABn0lEQVRYhe2Wy7KCMBBEByIIgqKIKL7//yvNPAJELZK4uXfB2UxVoAfpdAYBZmZm/iGLKu5JNh+XFa3vpzpk0UD1fjGh5cv0b8hHHQ7fmqeOl7jTs7M2+3jYlvRbhx7ggbfpusY6siElfebUA6z0fbmuO12LfnVB+sRDD1DJkwpdV7JWkz730sNTvNpjffDSkho8/Rrwz63FDtp13pvaU8+Gl8B2oA0cgIW3HiDW97fAduw8A2CD79wAbFDZegbA4oaaG8DFpNInABaNFi11PUQBAbBoRVYFBMCm5Bd/hhso1LJ1lIrTLx1SCZ9JRTiZTJXkl10gSjlOv9pwjeQ4HcNOgmEtGbpzq2AbjiaEGAJzOAI4kbgwBuLh6IIa8AjZGAPpcJwD9EUkCjNdmjAb4qgf6yZHSlflq9+RvhuatdDPCB84AP2HSZRnmRFuOADDrpnp0smMcMEBGH9azXTBGRE79RwA23AzXXC8X10NOABvfwLwWJUavHSc1vcBsKijgWkbRgGwSEcdpiZslyil4m+hP8TKkKynX2JmZuZveAH7kQy9Z0xa3AAAAABJRU5ErkJggg==' }
+};
+
+
+const BRAND_BY_DOMAIN = Object.values(BRAND).reduce((map, b) => { map[b.domain] = b; return map; }, {});
+
+function stripWww(host) { return host.startsWith('www.') ? host.slice(4) : host; }
+
+function brandForUrl(url) {
+  try {
+    const host = stripWww(new URL(url).hostname);
+    if (BRAND_BY_DOMAIN[host]) return BRAND_BY_DOMAIN[host];
+    const parts = host.split('.');
+    while (parts.length > 1) {
+      parts.shift();
+      const hit = BRAND_BY_DOMAIN[parts.join('.')];
+      if (hit) return hit;
+    }
+  } catch { /* not a url */ }
+  return null;
+}
+
+function brandImg(brand, size, cls) {
+  return '<img class="brand-img ' + (cls || '') + '" src="' + brand.src + '" width="' + size + '" height="' + size + '" alt="" loading="lazy" draggable="false">';
+}
+
+function brandMark(key, size = 20, cls = '') {
+  const brand = BRAND[key];
+  if (brand) return brandImg(brand, size, cls);
+  return '<span class="brand-fallback">' + String(key || '?').slice(0, 2).toUpperCase() + '</span>';
+}
+
+function brandMarkForUrl(url, size = 20, fallbackText = '') {
+  const brand = brandForUrl(url);
+  if (brand) return brandImg(brand, size);
+  const letter = (fallbackText || hostOf(url) || '?').charAt(0).toUpperCase();
+  return '<span class="brand-fallback">' + esc(letter) + '</span>';
+}
+
+
+'use strict';
+/* ============================================================
+   Titanium — core: state, theme, tabs, navigation, home screen
+   ============================================================ */
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const LS_KEY = 'titanium.state.v1';
+const VERSION = '1.0.0';
+
+const RANK = { free: 0, premium: 1, ultimate: 2 };
+const PLANS = {
+  free: { name: 'Free', price: '$0', per: 'forever', blurb: 'Everything you need to browse privately.' },
+  premium: { name: 'Premium', price: '$4.99', per: 'month', blurb: 'Strict blocking, real VPN servers, sync.' },
+  ultimate: { name: 'Ultimate', price: '$9.99', per: 'month', blurb: 'No limits, custom filters, multi-device delegation.' }
+};
+const LIMITS = {
+  extensions: { free: 2, premium: 10, ultimate: Infinity },
+  vpnServers: { free: 3, premium: 12, ultimate: 16 },
+  retention: { free: 7, premium: 90, ultimate: 365 }
+};
+const can = (need) => RANK[S.plan] >= RANK[need];
+
+const ENGINES = [
+  { id: 'duckduckgo', name: 'DuckDuckGo', letter: 'D', color: '#de5833', search: 'https://duckduckgo.com/?q=%s', note: 'No tracking, no search profile' },
+  { id: 'google', name: 'Google', letter: 'G', color: '#4285f4', search: 'https://www.google.com/search?q=%s', note: 'Best coverage, most data collection' },
+  { id: 'brave', name: 'Brave Search', letter: 'B', color: '#fb542b', search: 'https://search.brave.com/search?q=%s', note: 'Independent index, private by default' },
+  { id: 'ecosia', name: 'Ecosia', letter: 'E', color: '#1f8a4c', search: 'https://www.ecosia.org/search?q=%s', note: 'Plants trees with its ad revenue' },
+  { id: 'bing', name: 'Bing', letter: 'B', color: '#00897b', search: 'https://www.bing.com/search?q=%s', note: 'Microsoft index' },
+  { id: 'yahoo', name: 'Yahoo', letter: 'Y', color: '#6001d2', search: 'https://search.yahoo.com/search?p=%s', note: 'Powered by Bing' },
+  { id: 'startpage', name: 'Startpage', letter: 'S', color: '#4b6bfb', search: 'https://www.startpage.com/sp/search?query=%s', note: 'Google results, zero tracking' },
+  { id: 'qwant', name: 'Qwant', letter: 'Q', color: '#5c97ff', search: 'https://www.qwant.com/?q=%s', note: 'European privacy index' },
+  { id: 'mojeek', name: 'Mojeek', letter: 'M', color: '#ef7d1a', search: 'https://www.mojeek.com/search?q=%s', note: 'Own crawler, no profiling' },
+  { id: 'swisscows', name: 'Swisscows', letter: 'S', color: '#0a86b8', search: 'https://swisscows.com/en/web?query=%s', note: 'Swiss-hosted, family safe' },
+  { id: 'presearch', name: 'Presearch', letter: 'P', color: '#1f7dff', search: 'https://presearch.com/search?q=%s', note: 'Community-run and decentralized' },
+  { id: 'searx', name: 'SearXNG', letter: 'X', color: '#5a7d8c', search: 'https://searx.be/search?q=%s', note: 'Open-source metasearch' },
+  { id: 'yandex', name: 'Yandex', letter: 'Y', color: '#fc3f1d', search: 'https://yandex.com/search/?text=%s', note: 'Strong for regional results' },
+  { id: 'kagi', name: 'Kagi', letter: 'K', color: '#ffb319', search: 'https://kagi.com/search?q=%s', note: 'Paid, ad-free, no ranking games' },
+  { id: 'baidu', name: 'Baidu', letter: 'B', color: '#2932e1', search: 'https://www.baidu.com/s?wd=%s', note: 'Chinese-language index' }
+];
+
+const BRAND_ALIAS = { searx: 'searxng' };
+ENGINES.forEach((e) => { e.brand = BRAND_ALIAS[e.id] || e.id; });
+
+const ACCENTS = [
+  { id: 'blue', name: 'Titanium blue', color: '#8ab4f8', need: 'free' },
+  { id: 'violet', name: 'Violet', color: '#b9a6ff', need: 'premium' },
+  { id: 'mint', name: 'Mint', color: '#7ee0c0', need: 'premium' },
+  { id: 'amber', name: 'Amber', color: '#f5c26b', need: 'premium' },
+  { id: 'rose', name: 'Rose', color: '#f6a5b8', need: 'premium' },
+  { id: 'lime', name: 'Lime', color: '#b6e36a', need: 'premium' },
+  { id: 'ice', name: 'Ice', color: '#cfd8e3', need: 'premium' }
+];
+
+const THEMES = [
+  { id: 'midnight', name: 'Midnight', need: 'free' },
+  { id: 'slate', name: 'Slate', need: 'premium' },
+  { id: 'oled', name: 'OLED black', need: 'premium' },
+  { id: 'day', name: 'Daylight', need: 'premium' },
+  { id: 'sepia', name: 'Sepia', need: 'premium' }
+];
+
+const DEFAULT_STATE = {
+  onboarded: false,
+  heardFrom: '',
+  device: 'mobile',
+  plan: 'free',
+  engine: 'duckduckgo',
+  customEngine: { name: '', url: '' },
+  account: null,
+  theme: { preset: 'minimal', mode: 'midnight', accent: '#8ab4f8', accentId: 'blue', radius: 14, density: 'cozy', font: 15, wallpaper: false, tabLabels: true, iconStyle: 'color', searchShape: 'pill', animations: true },
+  home: { shortcuts: true, safety: true, quicklinks: true, recent: true, suggestions: true, engines: true, greeting: true, status: true },
+  privacy: { adblock: 'balanced', safeBrowsing: true, dnt: true, httpsOnly: true, cookies: true, filters: '' },
+  vpn: { on: false, server: 'auto', protocol: 'wireguard', killSwitch: false, split: false },
+  history: { on: true, retention: 7, incognito: false, items: [] },
+  delegation: { active: null, pending: { label: '', scope: { titles: true, urls: true, downloads: false }, days: 30 }, log: [] },
+  shortcuts: [
+    { name: 'Wikipedia', url: 'https://wikipedia.org' },
+    { name: 'YouTube', url: 'https://youtube.com' },
+    { name: 'GitHub', url: 'https://github.com' },
+    { name: 'Reddit', url: 'https://reddit.com' },
+    { name: 'Hacker News', url: 'https://news.ycombinator.com' },
+    { name: 'MDN', url: 'https://developer.mozilla.org' },
+    { name: 'Maps', url: 'https://maps.google.com' },
+    { name: 'X', url: 'https://x.com' }
+  ]
+};
+
+let S = loadState();
+let tabs = [{ id: 't1', url: null, title: 'New tab', stack: [], idx: -1 }];
+let activeId = 't1';
+let sheetStack = [];
+let frameTimer = null;
+
+function deepMerge(base, patch) {
+  if (Array.isArray(base)) return Array.isArray(patch) ? patch : base;
+  if (base && typeof base === 'object') {
+    const out = { ...base };
+    for (const k of Object.keys(base)) if (patch && k in patch) out[k] = deepMerge(base[k], patch[k]);
+    for (const k of Object.keys(patch || {})) if (!(k in base)) out[k] = patch[k];
+    return out;
+  }
+  return patch === undefined ? base : patch;
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    const parsed = JSON.parse(raw);
+    const merged = deepMerge(structuredClone(DEFAULT_STATE), parsed);
+    merged.history.retention = clamp(Number(merged.history.retention) || 7, 1, LIMITS.retention[merged.plan] || 7);
+    return merged;
+  } catch {
+    return structuredClone(DEFAULT_STATE);
+  }
+}
+
+function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch { /* storage full / blocked */ }
+}
+
+function getPath(path) {
+  return path.split('.').reduce((o, k) => (o == null ? o : o[k]), S);
+}
+function setPath(path, value) {
+  const keys = path.split('.');
+  const last = keys.pop();
+  const target = keys.reduce((o, k) => o[k], S);
+  target[last] = value;
+}
+function engine() {
+  const custom = S.customEngine;
+  if (custom && custom.name && custom.url) return { id: 'custom', name: custom.name, brand: null, letter: custom.name[0].toUpperCase(), color: '#8b93a1', search: custom.url };
+  return ENGINES.find((e) => e.id === S.engine) || ENGINES[0];
+}
+function deviceName() {
+  return S.device === 'pc' ? 'Desktop' : 'Mobile';
+}
+function greet() {
+  const h = new Date().getHours();
+  const part = h < 5 ? 'Still up' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const first = S.account?.name ? S.account.name.split(' ')[0] : '';
+  return first ? `${part}, ${first}` : part;
+}
+function hostOf(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
+}
+function hueFor(text) {
+  let h = 0;
+  for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) % 360;
+  return h;
+}
+function badgeFor(url) {
+  const host = hostOf(url);
+  return { letter: (host[0] || '?').toUpperCase(), color: `hsl(${hueFor(host)} 48% 42%)` };
+}
+function timeAgo(ts) {
+  const d = Math.max(1, Math.round((Date.now() - ts) / 60000));
+  if (d < 60) return `${d} min ago`;
+  const h = Math.round(d / 60);
+  if (h < 24) return `${h} h ago`;
+  return `${Math.round(h / 24)} d ago`;
+}
+
+/* ---------- theme + device ---------- */
+function applySettings() {
+  const t = S.theme;
+  const html = document.documentElement;
+  html.dataset.theme = t.mode;
+  html.dataset.device = S.device;
+  html.dataset.density = t.density;
+  html.dataset.icons = t.iconStyle || 'color';
+  html.dataset.shape = t.searchShape || 'pill';
+  html.classList.toggle('no-anim', t.animations === false);
+  html.style.setProperty('--accent', t.accent);
+  html.style.setProperty('--r', `${t.radius}px`);
+  html.style.setProperty('--font-size', `${t.font}px`);
+  html.style.fontSize = `${t.font}px`;
+  document.body.style.fontSize = `${t.font}px`;
+  document.body.style.background = t.wallpaper
+    ? undefined
+    : 'var(--bg-deep)';
+  $('.home')?.classList.toggle('no-glow', !t.wallpaper);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = getComputedStyle(html).getPropertyValue('--bg').trim() || '#15161a';
+  if (S.privacy.adblock === 'off') S.privacy.safeBrowsing = S.privacy.safeBrowsing; // no-op, keeps shape
+}
+
+/* ---------- tabs ---------- */
+function activeTab() {
+  return tabs.find((t) => t.id === activeId) || tabs[0];
+}
+
+function renderTopbar() {
+  const strip = $('#tabstrip');
+  if (!strip) return;
+  const showLabels = S.theme.tabLabels !== false;
+  strip.innerHTML = tabs.map((t) => {
+    const label = t.url ? hostOf(t.url) : 'New tab';
+    const mark = t.url ? brandMarkForUrl(t.url, 18, label) : '<img class="brand-img" src="icon.svg" width="18" height="18" alt="">';
+    return `<button class="tab-tile ${t.id === activeId ? 'active' : ''}" data-tab="${t.id}" role="tab" aria-selected="${t.id === activeId}" title="${esc(label)}">
+      ${mark}
+      ${showLabels ? `<span class="tab-label">${esc(label.length > 14 ? label.slice(0, 13) + '…' : label)}</span>` : ''}
+    </button>`;
+  }).join('');
+  $('#tabCountBtn').textContent = String(tabs.length);
+  $$('#tabstrip .tab-tile').forEach((btn) => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+}
+
+function switchTab(id) {
+  activeId = id;
+  renderTopbar();
+  renderView();
+}
+
+function newTab(url = null) {
+  const cap = S.plan === 'free' ? 5 : S.plan === 'premium' ? 20 : Infinity;
+  if (tabs.length >= cap) {
+    toast(`Your plan allows ${cap} tabs at once`);
+    openSheet('plans');
+    return;
+  }
+  const id = 't' + uid();
+  tabs.push({ id, url: null, title: 'New tab', stack: [], idx: -1 });
+  activeId = id;
+  renderTopbar();
+  if (url) navigate(url);
+  else renderView();
+  $('#searchInput')?.focus();
+}
+
+function closeTab(id) {
+  if (tabs.length === 1) {
+    const t = tabs[0];
+    t.url = null; t.stack = []; t.idx = -1;
+    renderTopbar(); renderView();
+    return;
+  }
+  const i = tabs.findIndex((t) => t.id === id);
+  tabs = tabs.filter((t) => t.id !== id);
+  if (activeId === id) activeId = tabs[Math.max(0, i - 1)].id;
+  renderTopbar(); renderView();
+}
+
+function goHome() {
+  const t = activeTab();
+  t.url = null;
+  renderTopbar(); renderView();
+}
+
+/* ---------- navigation ---------- */
+function toURL(input) {
+  const q = String(input || '').trim();
+  if (!q) return null;
+  if (/^(https?|file):\/\//i.test(q)) return q;
+  if (/^(about|chrome|titanium):/i.test(q)) return q;
+  if (/^localhost(:\d+)?(\/|$)/i.test(q)) return 'http://' + q;
+  if (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(q) && !/\s/.test(q)) return 'https://' + q;
+  if (/^\d{1,3}(\.\d{1,3}){3}(:\d+)?(\/|$)/.test(q)) return 'http://' + q;
+  return engine().search.replace('%s', encodeURIComponent(q));
+}
+
+function navigate(input, opts = {}) {
+  const url = toURL(input);
+  if (!url) return;
+  const t = activeTab();
+  if (!opts.replace) {
+    t.stack = t.stack.slice(0, t.idx + 1);
+    t.stack.push(url);
+    t.idx = t.stack.length - 1;
+  } else {
+    t.stack[t.idx] = url;
+  }
+  t.url = url;
+  recordHistory(url);
+  $('#suggest').hidden = true;
+  renderTopbar();
+  renderView();
+}
+
+function back() {
+  const t = activeTab();
+  if (t.idx > 0) {
+    t.idx -= 1;
+    t.url = t.stack[t.idx];
+    renderView();
+  } else {
+    goHome();
+  }
+}
+
+function recordHistory(url) {
+  if (!S.history.on) return;
+  if (S.history.incognito) return;
+  if (/^titanium:/i.test(url)) return;
+  const entry = { id: uid(), url, title: hostOf(url), ts: Date.now() };
+  S.history.items = [entry, ...S.history.items.filter((h) => h.url !== url)].slice(0, 600);
+  pruneHistory();
+  save();
+  renderHome();
+}
+
+function pruneHistory() {
+  const days = LIMITS.retention[S.plan] || 7;
+  if (S.history.retention > days) S.history.retention = days;
+  const cutoff = Date.now() - S.history.retention * 86400000;
+  S.history.items = S.history.items.filter((h) => h.ts >= cutoff);
+}
+
+/* ---------- views ---------- */
+function renderView() {
+  const t = activeTab();
+  const homeView = $('#homeView');
+  const pageView = $('#pageView');
+  if (!homeView || !pageView) return;
+  const isHome = !t.url;
+  homeView.hidden = !isHome;
+  pageView.hidden = isHome;
+  if (isHome) {
+    renderHome();
+    return;
+  }
+  $('#addressInput').value = t.url;
+  const lock = $('#lockIcon');
+  lock.classList.toggle('insecure', !/^https:/i.test(t.url));
+  loadFrame(t.url);
+}
+
+function loadFrame(url) {
+  const frame = $('#frame');
+  const fallback = $('#frameFallback');
+  fallback.hidden = true;
+  clearTimeout(frameTimer);
+  if (!/^https?:/i.test(url)) {
+    $('#ffSite').textContent = 'Titanium only loads http and https pages in the tab frame.';
+    fallback.hidden = false;
+    return;
+  }
+  frame.src = url;
+  frameTimer = setTimeout(() => {
+    let blocked = false;
+    try {
+      const doc = frame.contentDocument;
+      if (doc && (doc.location.href === 'about:blank' || !doc.body || doc.body.childElementCount === 0)) blocked = true;
+    } catch { blocked = false; }
+    if (blocked) {
+      $('#ffSite').textContent = `${hostOf(url)} refused to be embedded (X-Frame-Options or a frame-ancestors CSP). A single-file browser can't strip that header — open it in your installed browser instead.`;
+      fallback.hidden = false;
+    }
+  }, 3200);
+}
+
+/* ---------- home ---------- */
+function renderHome() {
+  if (!$('#homeView')) return;
+  $('#hello').textContent = greet();
+  $('#hello').hidden = S.home.greeting === false;
+  const pill = $('#planPill');
+  pill.textContent = PLANS[S.plan].name;
+  pill.classList.toggle('ult', S.plan === 'ultimate');
+
+  const eng = engine();
+  const badge = $('#engineBadge');
+  badge.innerHTML = eng.brand ? brandMark(eng.brand, 26) : `<span class="brand-fallback">${esc(eng.letter || 'S')}</span>`;
+  $('#searchInput').placeholder = `Search ${eng.name} or type URL`;
+
+  const safety = $('#safetyCard');
+  safety.classList.toggle('armed', S.privacy.safeBrowsing);
+  if (S.privacy.safeBrowsing) {
+    $('#safetyTitle').textContent = 'Safe Browsing is on';
+    $('#safetyText').textContent = 'Dangerous sites and downloads are flagged';
+    $('#safetyBtn').textContent = 'Review protections';
+  } else {
+    $('#safetyTitle').textContent = 'Turn on Safe Browsing';
+    $('#safetyText').textContent = 'Get protection against dangerous sites';
+    $('#safetyBtn').textContent = 'Go to settings';
+  }
+
+  $('#quicklinks').innerHTML = (S.shortcuts || []).slice(0, can('premium') ? 12 : 8).map((s, i) => {
+    return `<button class="quicklink" data-shortcut="${i}" title="${esc(s.url)}">
+      <span class="ql-badge">${brandMarkForUrl(s.url, 26, s.name)}</span>
+      <span>${esc(s.name)}</span>
+    </button>`;
+  }).join('');
+  $$('#quicklinks .quicklink').forEach((b) => b.addEventListener('click', () => navigate(S.shortcuts[Number(b.dataset.shortcut)].url)));
+
+  $('#vpnStatus').textContent = S.vpn.on ? `VPN on · ${serverName(S.vpn.server)}` : 'VPN off';
+  $('#vpnSub').textContent = S.vpn.on ? `${S.vpn.protocol} tunnel active` : 'No tunnel active';
+  $('#dotVpn').className = 'dot' + (S.vpn.on ? ' on' : '');
+
+  const adLabels = { off: 'Ad block off', balanced: 'Ad block on', strict: 'Strict blocking', aggressive: 'Ultimate blocking' };
+  $('#blockStatus').textContent = adLabels[S.privacy.adblock] || 'Ad block on';
+  $('#blockSub').textContent = S.privacy.adblock === 'off' ? 'Nothing is filtered' : 'Trackers, ads and annoyances filtered';
+  $('#dotBlock').className = 'dot' + (S.privacy.adblock === 'off' ? '' : ' on');
+
+  $('#histStatus').textContent = S.history.incognito ? 'Private mode' : S.history.on ? 'History on' : 'History off';
+  $('#histSub').textContent = S.history.on && !S.history.incognito ? `Kept ${S.history.retention} days` : S.history.incognito ? 'New tabs start private' : 'Nothing is recorded';
+  $('#dotHist').className = 'dot' + (S.history.on && !S.history.incognito ? ' on' : ' warn');
+
+  const recent = S.history.items.slice(0, 4);
+  const recentWrap = $('#recent');
+  recentWrap.hidden = !S.home.recent || recent.length === 0;
+  recentWrap.innerHTML = recent.length ? `
+    <div class="recent-head"><h3>Jump back in</h3><button data-act="history">History</button></div>
+          ${recent.map((h) => `<button class="recent-item" data-url="${esc(h.url)}">
+      <span class="r-badge">${brandMarkForUrl(h.url, 20, h.title)}</span>
+      <span class="r-body"><b>${esc(h.title)}</b><small>${esc(h.url)} · ${timeAgo(h.ts)}</small></span>
+    </button>`).join('')}` : '';
+  $$('#recent .recent-item').forEach((b) => b.addEventListener('click', () => navigate(b.dataset.url)));
+
+  if (!S.home.quicklinks) $('#quicklinks').hidden = true; else $('#quicklinks').hidden = false;
+  $('#safetyCard').hidden = !S.home.safety;
+  $('#addShortcutBtn').hidden = !S.home.shortcuts;
+  $('#statusCard').hidden = S.home.status === false;
+
+  const strip = $('#engineStrip');
+  if (strip) {
+    strip.hidden = S.home.engines === false;
+    strip.innerHTML = ENGINES.map((e) => `<button class="engine-chip" data-act="engine" data-engine="${e.id}"
+      title="${esc(e.name)}" aria-label="Search with ${esc(e.name)}"
+      aria-pressed="${S.engine === e.id && !S.customEngine.name}">${brandMark(e.brand, 24)}</button>`).join('');
+  }
+}
+
+/* ---------- sheet router ---------- */
+function openSheet(name, params = {}) {
+  if (!name || name === sheetStack[sheetStack.length - 1]) {
+    renderSheet();
+    $('#sheet').hidden = false;
+    return;
+  }
+  sheetStack.push(name);
+  sheetParams = params;
+  $('#sheet').hidden = false;
+  renderSheet();
+}
+let sheetParams = {};
+
+function navigateSheet(name, params = {}) {
+  sheetStack.push(name);
+  sheetParams = params;
+  renderSheet(true);
+}
+
+function sheetBack() {
+  if (sheetStack.length > 1) sheetStack.pop();
+  renderSheet(true);
+}
+
+function closeSheet() {
+  $('#sheet').hidden = true;
+  sheetStack = [];
+  sheetParams = {};
+}
+
+function renderSheet(keepScroll = false) {
+  const body = $('#sheetBody');
+  const scroll = keepScroll ? body.scrollTop : 0;
+  if (!sheetStack.length) sheetStack = ['root'];
+  const name = sheetStack[sheetStack.length - 1];
+  const panel = PANELS[name] || PANELS.root;
+  const out = panel(sheetParams);
+  $('#sheetTitle').textContent = out.title;
+  body.innerHTML = out.html;
+  $('#sheetBack').style.visibility = sheetStack.length > 1 ? 'visible' : 'hidden';
+  body.scrollTop = scroll;
+  if (out.bind) out.bind(body);
+}
+
+/* ---------- toast + modal ---------- */
+let toastTimer = null;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function openModal(html, onMount) {
+  $('#modal').hidden = false;
+  $('#modalCard').innerHTML = html;
+  if (onMount) onMount($('#modalCard'));
+}
+function closeModal() {
+  $('#modal').hidden = true;
+  $('#modalCard').innerHTML = '';
+}
+
+/* ---------- adblock + vpn helpers ---------- */
+const SERVERS = [
+  { id: 'auto', name: 'Auto (fastest)', need: 'free', flag: '⚡' },
+  { id: 'us', name: 'United States', need: 'free', flag: '🇺🇸' },
+  { id: 'nl', name: 'Netherlands', need: 'free', flag: '🇳🇱' },
+  { id: 'de', name: 'Germany', need: 'premium', flag: '🇩🇪' },
+  { id: 'uk', name: 'United Kingdom', need: 'premium', flag: '🇬🇧' },
+  { id: 'ca', name: 'Canada', need: 'premium', flag: '🇨🇦' },
+  { id: 'fr', name: 'France', need: 'premium', flag: '🇫🇷' },
+  { id: 'se', name: 'Sweden', need: 'premium', flag: '🇸🇪' },
+  { id: 'ch', name: 'Switzerland', need: 'premium', flag: '🇨🇭' },
+  { id: 'jp', name: 'Japan', need: 'premium', flag: '🇯🇵' },
+  { id: 'sg', name: 'Singapore', need: 'premium', flag: '🇸🇬' },
+  { id: 'au', name: 'Australia', need: 'premium', flag: '🇦🇺' },
+  { id: 'br', name: 'Brazil', need: 'ultimate', flag: '🇧🇷' },
+  { id: 'in', name: 'India', need: 'ultimate', flag: '🇮🇳' },
+  { id: 'za', name: 'South Africa', need: 'ultimate', flag: '🇿🇦' },
+  { id: 'is', name: 'Iceland', need: 'ultimate', flag: '🇮🇸' }
+];
+function serverName(id) {
+  return (SERVERS.find((s) => s.id === id) || SERVERS[0]).name;
+}
+
+/* ---------- events ---------- */
+function wire() {
+  $('#homeBtn').addEventListener('click', goHome);
+  $('#newTabBtn').addEventListener('click', () => newTab());
+  $('#tabCountBtn').addEventListener('click', () => openSheet('tabs'));
+  $('#menuBtn').addEventListener('click', () => openSheet('root'));
+  $('#planPill').addEventListener('click', () => openSheet('plans'));
+
+  $('#searchForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = $('#searchInput').value;
+    if (!v.trim()) return;
+    navigate(v);
+    $('#searchInput').value = '';
+  });
+  $('#searchInput').addEventListener('input', renderSuggest);
+  $('#searchInput').addEventListener('focus', renderSuggest);
+  $('#micBtn').addEventListener('click', voiceSearch);
+
+  $('#addShortcutBtn').addEventListener('click', addShortcutDialog);
+  $('#safetyBtn').addEventListener('click', () => openSheet('privacy'));
+
+  $('#addressForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    navigate($('#addressInput').value, { replace: true });
+  });
+  $('#backBtn').addEventListener('click', back);
+  $('#reloadBtn').addEventListener('click', () => loadFrame(activeTab().url));
+
+  $('#ffOpen').addEventListener('click', () => {
+    const u = activeTab().url;
+    if (u) window.open(u, '_blank', 'noopener');
+  });
+  $('#ffCopy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(activeTab().url); toast('Link copied'); } catch { toast('Copy failed'); }
+  });
+
+  $('#sheetClose').addEventListener('click', closeSheet);
+  $('#sheetBack').addEventListener('click', sheetBack);
+  $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
+
+  $('#homeView').addEventListener('scroll', () => {
+    $('#topbar').classList.toggle('scrolled', $('#homeView').scrollTop > 6);
+  }, { passive: true });
+
+  document.addEventListener('click', (e) => {
+    const act = e.target.closest('[data-act]');
+    if (act) {
+      const fn = window.ACTIONS && ACTIONS[act.dataset.act];
+      if (fn) { e.preventDefault(); fn(act, e); }
+      return;
+    }
+    if (!e.target.closest('.searchpill') && !e.target.closest('#suggest')) $('#suggest').hidden = true;
+  });
+
+  document.addEventListener('change', (e) => {
+    const node = e.target.closest('[data-input]');
+    if (!node) return;
+    const fn = window.ACTIONS && ACTIONS.input;
+    if (fn) fn(node, e);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const meta = e.metaKey || e.ctrlKey;
+    if (meta && e.key.toLowerCase() === 't') { e.preventDefault(); newTab(); }
+    if (meta && e.key.toLowerCase() === 'l') { e.preventDefault(); $('#searchInput')?.focus(); }
+    if (meta && e.key.toLowerCase() === 'w') { e.preventDefault(); closeTab(activeId); }
+    if (e.key === 'Escape') {
+      if (!$('#modal').hidden) closeModal();
+      else if (!$('#sheet').hidden) closeSheet();
+    }
+  });
+}
+
+function renderSuggest() {
+  const q = $('#searchInput').value.trim();
+  const box = $('#suggest');
+  if (!S.home.suggestions || q.length < 2) { box.hidden = true; return; }
+  const local = S.history.items
+    .filter((h) => (h.title + ' ' + h.url).toLowerCase().includes(q.toLowerCase()))
+    .slice(0, 3);
+  const rows = [
+    ...local.map((h) => ({ text: h.title, url: h.url, type: 'history' })),
+    { text: q, type: 'search' },
+    { text: q + ' news', type: 'search' }
+  ];
+  box.innerHTML = rows.map((r) => `<button data-sug="${esc(r.text)}">
+    <span>${esc(r.text)}</span><span class="sug-type">${r.type === 'history' ? 'history' : engine().name}</span>
+  </button>`).join('');
+  box.hidden = false;
+  $$('#suggest button').forEach((b) => b.addEventListener('click', () => {
+    const text = b.dataset.sug;
+    const hit = rows.find((r) => r.text === text && r.url);
+    navigate(hit ? hit.url : text);
+    $('#searchInput').value = '';
+    box.hidden = true;
+  }));
+}
+
+function voiceSearch() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const btn = $('#micBtn');
+  if (!SR) { toast('Voice search needs a browser with the Web Speech API'); return; }
+  const rec = new SR();
+  rec.lang = navigator.language || 'en-US';
+  rec.interimResults = false;
+  btn.classList.add('live');
+  rec.onresult = (ev) => {
+    const text = ev.results[0][0].transcript;
+    navigate(text);
+    $('#searchInput').value = '';
+  };
+  rec.onerror = () => toast('Could not hear that — try again');
+  rec.onend = () => btn.classList.remove('live');
+  try { rec.start(); } catch { btn.classList.remove('live'); }
+}
+
+function addShortcutDialog() {
+  openModal(`<h3>Add a shortcut</h3>
+    <p>Shortcuts sit on your start page. They never leave this device.</p>
+    <div class="field"><label>Name</label><input id="scName" type="text" placeholder="Example" maxlength="24"></div>
+    <div class="field"><label>Address</label><input id="scUrl" type="text" placeholder="example.com"></div>
+    <div class="modal-actions"><button class="ghost-btn" id="scCancel">Cancel</button><button class="primary-btn" id="scSave">Add</button></div>`,
+    (root) => {
+      $('#scCancel', root).addEventListener('click', closeModal);
+      $('#scSave', root).addEventListener('click', () => {
+        const name = $('#scName', root).value.trim();
+        const url = toURL($('#scUrl', root).value.trim());
+        if (!name || !url) { toast('Add a name and an address'); return; }
+        if (!S.home.shortcuts) { S.home.shortcuts = true; }
+        const max = can('premium') ? 12 : 8;
+        S.shortcuts = [...S.shortcuts, { name, url }].slice(-max);
+        save(); renderHome(); closeModal(); toast('Shortcut added');
+      });
+    });
+}
+
+
+'use strict';
+/* ============================================================
+   Titanium — onboarding: five questions before you browse
+   ============================================================ */
+
+const HEARD_FROM = [
+  { id: 'appstore', label: 'App Store or Play Store', glyph: '▣' },
+  { id: 'friend', label: 'A friend or family member', glyph: '☺' },
+  { id: 'youtube', label: 'YouTube', glyph: '▶' },
+  { id: 'social', label: 'TikTok, Instagram or X', glyph: '#' },
+  { id: 'search', label: 'A search result', glyph: '⌕' },
+  { id: 'github', label: 'GitHub or open source', glyph: '⑂' },
+  { id: 'podcast', label: 'A podcast or newsletter', glyph: '◉' },
+  { id: 'other', label: 'Somewhere else', glyph: '…' }
+];
+
+let obStep = 0;
+let obDraft = {
+  heardFrom: '',
+  device: 'mobile',
+  accountMode: 'create',
+  name: '',
+  email: '',
+  historyOn: true,
+  incognito: false,
+  delegationMode: 'device',
+  delegateLabel: '',
+  scope: { titles: true, urls: true, downloads: false },
+  expiry: 30,
+  importCode: ''
+};
+
+function startOnboarding() {
+  const saved = S.heardFrom;
+  if (saved) obDraft.heardFrom = saved;
+  obDraft.device = S.device || 'mobile';
+  $('#onboard').hidden = false;
+  $('#app').hidden = true;
+  $('#boot').classList.add('hide');
+  setTimeout(() => { $('#boot').hidden = true; }, 380);
+  renderOnboard();
+}
+
+function renderOnboard() {
+  const total = 5;
+  $('#progress').innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i <= obStep ? 'on' : ''}"></i>`).join('');
+  $('#onboardBody').innerHTML = ONBOARD_STEPS[obStep]();
+  $('#onboardBack').hidden = obStep === 0;
+  $('#onboardNext').textContent = obStep === total - 1 ? 'Start browsing' : 'Continue';
+  $('#onboardBody').scrollTop = 0;
+  bindOnboard();
+}
+
+function bindOnboard() {
+  $$('#onboardBody [data-heard]').forEach((b) => b.addEventListener('click', () => {
+    obDraft.heardFrom = b.dataset.heard;
+    $$('#onboardBody [data-heard]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  }));
+  $$('#onboardBody [data-dev]').forEach((b) => b.addEventListener('click', () => {
+    obDraft.device = b.dataset.dev;
+    document.documentElement.dataset.device = obDraft.device;
+    $$('#onboardBody [data-dev]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    const note = $('#devNote');
+    if (note) note.textContent = obDraft.device === 'mobile'
+      ? 'Mobile layout: full-bleed cards, bigger targets, search-first start page.'
+      : 'Desktop layout: wide canvas, two-column start page, keyboard shortcuts on.';
+  }));
+  $$('#onboardBody [data-acct]').forEach((b) => b.addEventListener('click', () => {
+    obDraft.accountMode = b.dataset.acct;
+    $$('#onboardBody [data-acct]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    const fields = $('#acctFields');
+    if (fields) fields.hidden = obDraft.accountMode !== 'create';
+  }));
+  const histToggle = $('#obHist');
+  if (histToggle) histToggle.addEventListener('click', () => {
+    obDraft.historyOn = !obDraft.historyOn;
+    histToggle.setAttribute('aria-pressed', String(obDraft.historyOn));
+  });
+  const incToggle = $('#obIncognito');
+  if (incToggle) incToggle.addEventListener('click', () => {
+    obDraft.incognito = !obDraft.incognito;
+    incToggle.setAttribute('aria-pressed', String(obDraft.incognito));
+  });
+  $$('#onboardBody [data-deleg]').forEach((b) => b.addEventListener('click', () => {
+    obDraft.delegationMode = b.dataset.deleg;
+    $$('#onboardBody [data-deleg]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    const box = $('#delegBox');
+    if (box) box.hidden = obDraft.delegationMode !== 'delegate';
+    const imp = $('#importBox');
+    if (imp) imp.hidden = obDraft.delegationMode !== 'import';
+  }));
+  $$('#onboardBody [data-scope]').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.scope;
+    obDraft.scope[k] = !obDraft.scope[k];
+    b.setAttribute('aria-pressed', String(obDraft.scope[k]));
+  }));
+  $$('#onboardBody [data-expiry]').forEach((b) => b.addEventListener('click', () => {
+    obDraft.expiry = Number(b.dataset.expiry);
+    $$('#onboardBody [data-expiry]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  }));
+}
+
+const ONBOARD_STEPS = [
+  () => `
+    <div class="step-kicker">Question 1 of 5</div>
+    <h1 class="step-title">Where did you hear<br>about Titanium?</h1>
+    <p class="step-sub">It helps us know what to build next. Nothing is sent to a server — this stays in your browser profile.</p>
+    <div class="opt-grid">
+      ${HEARD_FROM.map((h) => `<button class="opt" data-heard="${h.id}" aria-pressed="${obDraft.heardFrom === h.id}">
+        <span class="opt-glyph">${h.glyph}</span><span>${h.label}</span>
+      </button>`).join('')}
+    </div>`,
+
+  () => `
+    <div class="step-kicker">Question 2 of 5</div>
+    <h1 class="step-title">What are you<br>browsing on?</h1>
+    <p class="step-sub">Titanium reshapes itself for the screen you pick. Tap the other one any time in Settings → Appearance.</p>
+    <div class="device-pick">
+      <button class="device-card" data-dev="mobile" aria-pressed="${obDraft.device === 'mobile'}">
+        <span class="device-art"><span class="screen"></span></span>
+        Mobile
+      </button>
+      <button class="device-card" data-dev="pc" aria-pressed="${obDraft.device === 'pc'}">
+        <span class="device-art pc"><span class="screen"></span></span>
+        PC or laptop
+      </button>
+    </div>
+    <div class="banner">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 8l7-5 7 5v8l-7 5-7-5Z"/></svg>
+      <div><b>Mobile first</b><span id="devNote">${obDraft.device === 'mobile' ? 'Mobile layout: full-bleed cards, bigger targets, search-first start page.' : 'Desktop layout: wide canvas, two-column start page, keyboard shortcuts on.'}</span></div>
+    </div>`,
+
+  () => `
+    <div class="step-kicker">Question 3 of 5</div>
+    <h1 class="step-title">Who's doing<br>the browsing?</h1>
+    <p class="step-sub">Titanium accounts are local. No password, no server, no email verification — just a profile that keeps your shortcuts, plan and history together on this device.</p>
+    <div class="opt-grid">
+      <button class="opt" data-acct="create" aria-pressed="${obDraft.accountMode === 'create'}">
+        <span class="opt-glyph">＋</span><span>Create a local profile<small>Name, email and an avatar colour</small></span>
+      </button>
+      <button class="opt" data-acct="guest" aria-pressed="${obDraft.accountMode === 'guest'}">
+        <span class="opt-glyph">◐</span><span>Continue as guest<small>Everything works, nothing is labelled</small></span>
+      </button>
+      <button class="opt" data-acct="later" aria-pressed="${obDraft.accountMode === 'later'}">
+        <span class="opt-glyph">→</span><span>Set it up later<small>Add a profile from Settings</small></span>
+      </button>
+    </div>
+    <div class="field" id="acctFields" ${obDraft.accountMode !== 'create' ? 'hidden' : ''}>
+      <label>Display name</label>
+      <input id="obName" type="text" placeholder="Alex Rivera" maxlength="40" value="${esc(obDraft.name)}">
+      <label style="margin-top:8px">Email (stays on this device)</label>
+      <input id="obEmail" type="email" placeholder="you@example.com" value="${esc(obDraft.email)}">
+      <span class="hint">Used only for your profile card and plan receipts.</span>
+    </div>`,
+
+  () => `
+    <div class="step-kicker">Question 4 of 5</div>
+    <h1 class="step-title">Should Titanium<br>remember where<br>you've been?</h1>
+    <p class="step-sub">History powers suggestions, “jump back in” and delegation to another device. You can clear it in one tap — or never keep it at all.</p>
+    <div class="list">
+      <div class="list-row">
+        <span class="lr-icon">◷</span>
+        <span class="lr-body"><b>Save browsing history</b><small>${obDraft.historyOn ? 'Titles and addresses, kept locally' : 'History is off — nothing recorded'}</small></span>
+        <button class="toggle" id="obHist" aria-pressed="${obDraft.historyOn}" aria-label="Save history"></button>
+      </div>
+      <div class="list-row">
+        <span class="lr-icon">◑</span>
+        <span class="lr-body"><b>Start new tabs in private mode</b><small>Private tabs are never saved or delegated</small></span>
+        <button class="toggle" id="obIncognito" aria-pressed="${obDraft.incognito}" aria-label="Private by default"></button>
+      </div>
+    </div>
+    <div class="banner">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <div><b>Retention follows your plan</b><span>Free keeps 7 days, Premium 90 days, Ultimate a full year. You can shorten it at any time.</span></div>
+    </div>`,
+
+  () => `
+    <div class="step-kicker">Question 5 of 5</div>
+    <h1 class="step-title">Who gets to see<br>your history?</h1>
+    <p class="step-sub">History delegation lets you hand a scoped, expiring copy of your history to a person or another device — without an account server in the middle.</p>
+    <div class="opt-grid">
+      <button class="opt" data-deleg="device" aria-pressed="${obDraft.delegationMode === 'device'}">
+        <span class="opt-glyph">▢</span><span>Keep it on this device<small>Nothing leaves the browser</small></span>
+      </button>
+      <button class="opt" data-deleg="delegate" aria-pressed="${obDraft.delegationMode === 'delegate'}">
+        <span class="opt-glyph">⇄</span><span>Delegate to a trusted person<small>Premium and Ultimate · scoped and expiring</small></span>
+      </button>
+      <button class="opt" data-deleg="import" aria-pressed="${obDraft.delegationMode === 'import'}">
+        <span class="opt-glyph">⇩</span><span>Import history from another device<small>Paste a delegation code</small></span>
+      </button>
+    </div>
+    <div id="delegBox" ${obDraft.delegationMode !== 'delegate' ? 'hidden' : ''}>
+      <div class="field">
+        <label>Delegate's name</label>
+        <input id="obDelegName" type="text" placeholder="e.g. Sam — family iPad" value="${esc(obDraft.delegateLabel)}">
+      </div>
+      <div class="list">
+        <div class="list-row"><span class="lr-body"><b>What they can see</b><small>Pick the minimum you need</small></span></div>
+        <div class="chips">
+          <button class="chip" data-scope="titles" aria-pressed="${obDraft.scope.titles}">Titles</button>
+          <button class="chip" data-scope="urls" aria-pressed="${obDraft.scope.urls}">Full URLs</button>
+          <button class="chip" data-scope="downloads" aria-pressed="${obDraft.scope.downloads}">Downloads</button>
+        </div>
+        <div class="list-row" style="border-top:1px solid var(--line)"><span class="lr-body"><b>Access expires after</b><small>Then the code stops importing</small></span></div>
+        <div class="chips">
+          ${[1, 7, 30, 90].map((d) => `<button class="chip" data-expiry="${d}" aria-pressed="${obDraft.expiry === d}">${d} day${d > 1 ? 's' : ''}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="field" id="importBox" ${obDraft.delegationMode !== 'import' ? 'hidden' : ''}>
+      <label>Delegation code</label>
+      <textarea id="obImport" placeholder="TiD1.…"></textarea>
+      <span class="hint">Codes are base64 JSON bundles, not encrypted. Share them the way you'd share a file.</span>
+    </div>`
+];
+
+function obNext() {
+  if (obStep === 2) {
+    const name = $('#obName')?.value.trim();
+    const email = $('#obEmail')?.value.trim();
+    if (obDraft.accountMode === 'create') {
+      if (!name) { toast('Add a display name first'); return; }
+      obDraft.name = name;
+      obDraft.email = email || '';
+    }
+  }
+  if (obStep === 4) {
+    if (obDraft.delegationMode === 'delegate') {
+      obDraft.delegateLabel = $('#obDelegName')?.value.trim() || 'Trusted device';
+    }
+    if (obDraft.delegationMode === 'import') {
+      obDraft.importCode = $('#obImport')?.value.trim() || '';
+    }
+  }
+  if (obStep < ONBOARD_STEPS.length - 1) {
+    obStep += 1;
+    renderOnboard();
+  } else {
+    finishOnboarding();
+  }
+}
+
+function obBack() {
+  if (obStep > 0) {
+    obStep -= 1;
+    renderOnboard();
+  }
+}
+
+function finishOnboarding() {
+  S.heardFrom = obDraft.heardFrom || 'not specified';
+  S.device = obDraft.device;
+  S.history.on = obDraft.historyOn;
+  S.history.incognito = obDraft.incognito;
+
+  if (obDraft.accountMode === 'create') {
+    S.account = {
+      name: obDraft.name || 'Titanium user',
+      email: obDraft.email || '',
+      guest: false,
+      createdAt: Date.now()
+    };
+  } else if (obDraft.accountMode === 'guest') {
+    S.account = { name: 'Guest', email: '', guest: true, createdAt: Date.now() };
+  }
+
+  if (obDraft.delegationMode === 'delegate') {
+    S.delegation.active = {
+      label: obDraft.delegateLabel || 'Trusted device',
+      scope: { ...obDraft.scope },
+      expiresAt: Date.now() + obDraft.expiry * 86400000,
+      createdAt: Date.now(),
+      code: null
+    };
+    S.delegation.log.unshift({ ts: Date.now(), text: `Delegation granted to ${S.delegation.active.label}` });
+  }
+  if (obDraft.delegationMode === 'import' && obDraft.importCode) {
+    const result = importDelegation(obDraft.importCode);
+    if (!result.ok) toast(result.error);
+  }
+
+  S.onboarded = true;
+  save();
+  $('#onboard').hidden = true;
+  startApp();
+  toast(`Welcome${S.account && !S.account.guest ? ', ' + S.account.name.split(' ')[0] : ''} — you're on ${PLANS[S.plan].name}`);
+}
+
+
+'use strict';
+/* ============================================================
+   Titanium — panels part 1: building blocks, home, tabs,
+   appearance, search engines, privacy
+   ============================================================ */
+
+const ICON = {
+  palette: '<circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="9.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="9.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="9.5" cy="15" r="1.1" fill="currentColor" stroke="none"/><path d="M14 15.2c1.5.4 2.6-.3 2.9-1.6"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+  shield: '<path d="M12 3.2 19 6v6.1c0 4.3-3 7.6-7 8.9-4-1.3-7-4.6-7-8.9V6l7-2.8Z"/><path d="M9.2 12l2 2 3.6-4"/>',
+  globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.5 2.4 14.5 0 17M12 3.5c-2.4 2.5-2.4 14.5 0 17"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/>',
+  puzzle: '<path d="M9 4.5h6v3a2 2 0 1 0 3.5 1.6V15h-3a2 2 0 1 0-1.6 3.5H5V9.5h3a2 2 0 1 0 1-5Z"/>',
+  star: '<path d="M12 3.6l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.8l5.9-.8Z"/>',
+  info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 7.6v.1"/>',
+  tabs: '<rect x="3.5" y="7" width="13" height="12" rx="2.5"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 16h-1"/>',
+  user: '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1-3.4 3.6-5.2 7-5.2s6 1.8 7 5.2"/>',
+  trash: '<path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7"/>',
+  copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',
+  arrow: '<path d="M5 12h13M13 6l6 6-6 6"/>',
+  download: '<path d="M12 4v11M8 11.5l4 4 4-4M5 19h14"/>',
+  lock: '<rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8.5 10V8a3.5 3.5 0 0 1 7 0v2"/>',
+  power: '<path d="M12 4v8M7.5 6.8a7 7 0 1 0 9 0"/>',
+  sparkle: '<path d="M12 3.5l1.8 4.7 4.7 1.8-4.7 1.8L12 16.5l-1.8-4.7L5.5 10l4.7-1.8Z"/><path d="M18.5 16.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8Z"/>',
+  refresh: '<path d="M19 12a7 7 0 1 1-2.4-5.3M19 4v5h-5"/>',
+  mobile: '<rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/>',
+  monitor: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M9 20h6M12 17v3"/>',
+  ext: '<path d="M9 4.5h6v3a2 2 0 1 0 3.5 1.6V15h-3a2 2 0 1 0-1.6 3.5H5V9.5h3a2 2 0 1 0 1-5Z"/>',
+  code: '<path d="M8.5 7.5 4 12l4.5 4.5M15.5 7.5 20 12l-4.5 4.5M13 5l-2 14"/>'
+};
+
+const LOOK_PRESETS = {
+  minimal: { mode: 'midnight', accentId: 'blue', accent: '#8ab4f8', radius: 14, density: 'cozy', font: 15, wallpaper: false, iconStyle: 'color', searchShape: 'pill', animations: true },
+  reference: { mode: 'midnight', accentId: 'blue', accent: '#8ab4f8', radius: 22, density: 'comfortable', font: 15, wallpaper: true, iconStyle: 'color', searchShape: 'pill', animations: true },
+  mono: { iconStyle: 'mono', wallpaper: false, radius: 16, searchShape: 'rounded', density: 'comfortable', animations: true },
+  compact: { radius: 12, density: 'cozy', font: 14, wallpaper: false, iconStyle: 'color', searchShape: 'pill', animations: true },
+  bold: { accentId: 'violet', accent: '#b9a6ff', radius: 26, density: 'spacious', font: 16, wallpaper: true, iconStyle: 'color', searchShape: 'rounded', animations: true }
+};
+
+function ico(name, cls = '') {
+  return `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICON[name] || ''}</svg>`;
+}
+
+function toggleRow({ title, sub, path, checked, need, disabled }) {
+  const locked = need && !can(need);
+  return `<div class="list-row">
+    <span class="lr-body"><b>${esc(title)}${locked ? ' <span class="perm">' + (need === 'premium' ? 'Premium' : 'Ultimate') + '</span>' : ''}</b><small>${esc(sub)}</small></span>
+    <button class="toggle" data-act="toggle" data-path="${path}" ${need ? `data-need="${need}"` : ''} aria-pressed="${!!checked}" aria-label="${esc(title)}" ${disabled ? 'disabled' : ''}></button>
+  </div>`;
+}
+
+function rowButton({ icon, title, sub, panel, act, right }) {
+  return `<button class="list-row" ${panel ? `data-act="sheet" data-panel="${panel}"` : `data-act="${act}"`}>
+    <span class="lr-icon">${ico(icon)}</span>
+    <span class="lr-body"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</span>
+    ${right || '<span class="chev">›</span>'}
+  </button>`;
+}
+
+function planLock(need, label = '') {
+  if (!need || can(need)) return '';
+  return `<span class="perm">${need === 'premium' ? 'Premium' : 'Ultimate'}${label ? ' · ' + label : ''}</span>`;
+}
+
+const PANELS = {};
+
+/* ---------------- home / menu root ---------------- */
+PANELS.root = () => ({
+  title: 'Menu',
+  html: `
+    <button class="list-row" data-act="sheet" data-panel="account">
+      <span class="lr-icon" style="background:${S.account ? `hsl(${hueFor(S.account.name)} 45% 40%)` : 'var(--card-3)'};color:#fff;font-weight:800">${esc((S.account?.name || 'T')[0].toUpperCase())}</span>
+      <span class="lr-body">
+        <b>${esc(S.account ? S.account.name : 'No profile yet')}${S.account?.guest ? ' (guest)' : ''}</b>
+        <small>${esc(S.account?.email || 'Local profile')} · ${PLANS[S.plan].name} plan</small>
+      </span>
+      <span class="chev">›</span>
+    </button>
+    <button class="list-row" data-act="sheet" data-panel="plans" style="border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:14px;background:color-mix(in srgb,var(--accent) 10%,var(--card))">
+      <span class="lr-icon">${ico('star')}</span>
+      <span class="lr-body"><b>${S.plan === 'free' ? 'Upgrade Titanium' : PLANS[S.plan].name + ' is active'}</b><small>${S.plan === 'free' ? 'From $4.99 · strict blocking, VPN, delegation' : 'Manage your plan and receipts'}</small></span>
+      <span class="chev">›</span>
+    </button>
+
+    <div class="section-label">Browser</div>
+    <div class="list">
+      ${rowButton({ icon: 'tabs', title: 'Tabs', sub: `${tabs.length} open`, panel: 'tabs' })}
+      ${rowButton({ icon: 'search', title: 'Search engine', sub: engine().name, panel: 'engines' })}
+      ${rowButton({ icon: 'clock', title: 'History', sub: S.history.on ? `${S.history.items.length} entries · ${S.history.retention} days` : 'Off', panel: 'history' })}
+      ${rowButton({ icon: 'download', title: 'Delegation', sub: S.delegation.active ? `Granted to ${S.delegation.active.label}` : 'Not delegated', panel: 'delegation' })}
+    </div>
+
+    <div class="section-label">Protection</div>
+    <div class="list">
+      ${rowButton({ icon: 'shield', title: 'Privacy & ad blocking', sub: S.privacy.adblock === 'off' ? 'Blocking off' : `${S.privacy.adblock} blocking · Safe Browsing ${S.privacy.safeBrowsing ? 'on' : 'off'}`, panel: 'privacy' })}
+      ${rowButton({ icon: 'globe', title: 'VPN', sub: S.vpn.on ? `${serverName(S.vpn.server)} · connected` : 'Off', panel: 'vpn' })}
+      ${rowButton({ icon: 'puzzle', title: 'Extensions', sub: 'Chrome extensions, loaded locally', panel: 'extensions' })}
+    </div>
+
+    <div class="section-label">Make it yours</div>
+    <div class="list">
+      ${rowButton({ icon: 'palette', title: 'Appearance', sub: `${THEMES.find((x) => x.id === S.theme.mode)?.name || 'Midnight'} · ${deviceName()} layout`, panel: 'appearance' })}
+      ${rowButton({ icon: 'sparkle', title: 'Start page shortcuts', sub: `${S.shortcuts.length} shortcuts`, panel: 'shortcuts' })}
+      ${rowButton({ icon: 'code', title: 'Source code', sub: 'View, edit and download every file', act: 'openSource' })}
+      ${rowButton({ icon: 'info', title: 'About Titanium', sub: `v${VERSION} · MIT licensed`, panel: 'about' })}
+    </div>
+    <div class="list">
+      <button class="list-row" data-act="reset"><span class="lr-icon" style="color:var(--danger)">${ico('refresh')}</span><span class="lr-body"><b>Reset Titanium</b><small>Wipe local profile, history and settings</small></span></button>
+    </div>
+    <p class="hint" style="text-align:center;color:var(--muted-2);font-size:11.5px;margin:4px 0 0">Titanium ${VERSION} · everything is stored on this device</p>`
+});
+
+/* ---------------- tabs ---------------- */
+PANELS.tabs = () => ({
+  title: 'Tabs',
+  html: `
+    <div class="list" id="tabList">
+      ${tabs.map((t) => `<button class="list-row" data-act="switchTab" data-id="${t.id}">
+        <span class="lr-icon">${t.url ? esc(badgeFor(t.url).letter) : ico('home')}</span>
+        <span class="lr-body"><b>${esc(t.url ? hostOf(t.url) : 'New tab')}</b><small>${esc(t.url || 'Start page')}</small></span>
+        <span class="mini-btn danger" data-act="closeTab" data-id="${t.id}" role="button">Close</span>
+      </button>`).join('')}
+    </div>
+    <div class="plan-actions">
+      <button class="mini-btn accent" data-act="newtab">New tab</button>
+      <button class="mini-btn" data-act="closeOthers">Close others</button>
+    </div>
+    <div class="banner">${ico('info')}<div><b>Tab limit</b><span>${S.plan === 'free' ? 'Free allows 5 tabs at once — Premium raises it to 20, Ultimate is unlimited.' : 'Your plan has room for ' + (S.plan === 'premium' ? '20 tabs' : 'unlimited tabs') + '.'}</span></div></div>`
+});
+
+/* ---------------- appearance ---------------- */
+PANELS.appearance = () => ({
+  title: 'Appearance',
+  html: `
+    <div class="section-label">Presets</div>
+    <div class="chips">
+      ${[['minimal', 'Minimal'], ['reference', 'Reference'], ['mono', 'Monochrome'], ['compact', 'Compact'], ['bold', 'Bold']].map(([id, label]) => `<button class="chip" data-act="preset" data-preset="${id}" aria-pressed="${S.theme.preset === id}">${label}</button>`).join('')}
+    </div>
+
+    <div class="section-label">Theme</div>
+    <div class="chips">
+      ${THEMES.map((t) => `<button class="chip" data-act="theme" data-theme="${t.id}" aria-pressed="${S.theme.mode === t.id}">${t.name}</button>`).join('')}
+    </div>
+
+    <div class="section-label">Accent</div>
+    <div class="swatches">
+      ${ACCENTS.map((a) => `<button class="swatch" title="${a.name}" data-act="accent" data-accent="${a.id}" aria-pressed="${S.theme.accentId === a.id}" style="background:${a.color}"></button>`).join('')}
+      <label class="swatch" title="Custom accent" style="background:conic-gradient(#ff6b6b,#ffd166,#7ee0c0,#8ab4f8,#b9a6ff,#ff6b6b);display:grid;place-items:center;cursor:pointer">
+        <input type="color" data-input="theme.accent" value="${S.theme.accent}" style="opacity:0;width:100%;height:100%;border:0;cursor:pointer">
+      </label>
+    </div>
+
+    <div class="section-label">Layout</div>
+    <div class="list">
+      <div class="list-row">
+        <span class="lr-icon">${ico(S.device === 'mobile' ? 'mobile' : 'monitor')}</span>
+        <span class="lr-body"><b>Device layout</b><small>Optimised for ${deviceName().toLowerCase()}</small></span>
+        <div class="chips" style="padding:0">
+          <button class="chip" data-act="device" data-device="mobile" aria-pressed="${S.device === 'mobile'}">Mobile</button>
+          <button class="chip" data-act="device" data-device="pc" aria-pressed="${S.device === 'pc'}">PC</button>
+        </div>
+      </div>
+      <div class="range-row"><span class="lr-body"><b style="font-size:13.5px">Corner radius</b></span>
+        <input type="range" min="8" max="30" step="1" value="${S.theme.radius}" data-input="theme.radius">
+        <output>${S.theme.radius}px</output>
+      </div>
+      <div class="range-row"><span class="lr-body"><b style="font-size:13.5px">Text size</b></span>
+        <input type="range" min="13" max="18" step="1" value="${S.theme.font}" data-input="theme.font">
+        <output>${S.theme.font}px</output>
+      </div>
+      <div class="list-row">
+        <span class="lr-body"><b>Density</b><small>How much space cards get</small></span>
+        <div class="chips" style="padding:0">
+          ${['cozy', 'comfortable', 'spacious'].map((d) => `<button class="chip" data-act="density" data-density="${d}" aria-pressed="${S.theme.density === d}">${d[0].toUpperCase() + d.slice(1)}</button>`).join('')}
+        </div>
+      </div>
+      <div class="list-row">
+        <span class="lr-body"><b>Search bar</b><small>Corner treatment for the pill</small></span>
+        <div class="chips" style="padding:0">
+          ${[['pill', 'Pill'], ['rounded', 'Rounded'], ['square', 'Square']].map(([id, label]) => `<button class="chip" data-act="shape" data-shape="${id}" aria-pressed="${S.theme.searchShape === id}">${label}</button>`).join('')}
+        </div>
+      </div>
+      <div class="list-row">
+        <span class="lr-body"><b>Icons</b><small>Real colour marks or monochrome</small></span>
+        <div class="chips" style="padding:0">
+          ${[['color', 'Colour'], ['mono', 'Mono']].map(([id, label]) => `<button class="chip" data-act="iconStyle" data-icons="${id}" aria-pressed="${S.theme.iconStyle === id}">${label}</button>`).join('')}
+        </div>
+      </div>
+      ${toggleRow({ title: 'Ambient wallpaper glow', sub: 'Tint the canvas with your accent colour', path: 'theme.wallpaper', checked: S.theme.wallpaper })}
+      ${toggleRow({ title: 'Show tab names', sub: 'Off keeps the top strip icon-only, like a phone', path: 'theme.tabLabels', checked: S.theme.tabStyle === 'tiles' })}
+    </div>
+
+    <div class="section-label">Start page</div>
+    <div class="list">
+      ${toggleRow({ title: 'Shortcuts', sub: 'Your pinned sites under the search bar', path: 'home.shortcuts', checked: S.home.shortcuts })}
+      ${toggleRow({ title: 'Safety Check card', sub: 'The protection card from the start screen', path: 'home.safety', checked: S.home.safety })}
+      ${toggleRow({ title: 'Quick links grid', sub: 'Always-visible site tiles', path: 'home.quicklinks', checked: S.home.quicklinks })}
+      ${toggleRow({ title: 'Jump back in', sub: 'Recent history on the start page', path: 'home.recent', checked: S.home.recent })}
+      ${toggleRow({ title: 'Search suggestions', sub: 'History matches while you type', path: 'home.suggestions', checked: S.home.suggestions })}
+      ${toggleRow({ title: 'Engine strip', sub: 'A row of real engine icons under the search bar', path: 'home.engines', checked: S.home.engines !== false })}
+      ${toggleRow({ title: 'Greeting', sub: 'Time-of-day line above the search bar', path: 'home.greeting', checked: S.home.greeting !== false })}
+      ${toggleRow({ title: 'Status card', sub: 'VPN, ad blocking and history state', path: 'home.status', checked: S.home.status !== false })}
+      ${toggleRow({ title: 'Animations', sub: 'Sheet, hover and press motion', path: 'theme.animations', checked: S.theme.animations !== false })}
+    </div>
+    <button class="ghost-btn" data-act="resetLook">Reset look to defaults</button>`
+});
+
+/* ---------------- engines ---------------- */
+PANELS.engines = () => ({
+  title: 'Search engine',
+  html: `
+    <p class="step-sub">Titanium asks whichever engine you choose. Your pick is never sent anywhere but the engine itself.</p>
+    <div class="list">
+      ${ENGINES.map((e) => `<button class="list-row" data-act="engine" data-engine="${e.id}">
+        <span class="engine-logo" style="background:transparent">${brandMark(e.brand, 22)}</span>
+        <span class="lr-body"><b>${e.name}</b><small>${e.note}</small></span>
+        ${S.engine === e.id && !S.customEngine.name ? '<span class="perm" style="color:var(--accent)">Active</span>' : '<span class="chev">›</span>'}
+      </button>`).join('')}
+    </div>
+    <div class="section-label">Custom engine ${planLock('ultimate')}</div>
+    <div class="list">
+      <div class="field"><label>Name</label><input type="text" data-input="customEngine.name" value="${esc(S.customEngine.name)}" placeholder="My search" ${can('ultimate') ? '' : 'disabled'}></div>
+      <div class="field"><label>Query URL (use %s)</label><input type="text" data-input="customEngine.url" value="${esc(S.customEngine.url)}" placeholder="https://example.com/search?q=%s" ${can('ultimate') ? '' : 'disabled'}></div>
+      <div class="chips"><button class="mini-btn accent" data-act="useCustom" ${can('ultimate') ? '' : 'disabled'}>Use custom engine</button>
+      ${S.customEngine.name ? '<button class="mini-btn danger" data-act="clearCustom">Remove</button>' : ''}</div>
+    </div>`
+});
+
+/* ---------------- privacy ---------------- */
+PANELS.privacy = () => ({
+  title: 'Privacy',
+  html: `
+    <div class="section-label">Ad & tracker blocking</div>
+    <div class="chips">
+      ${[['off', 'Off', 'free'], ['balanced', 'Balanced', 'free'], ['strict', 'Strict', 'premium'], ['aggressive', 'Aggressive', 'ultimate']].map(([id, label, need]) => `
+        <button class="chip ${can(need) ? '' : 'lock'}" data-act="adblock" data-level="${id}" aria-pressed="${S.privacy.adblock === id}">${label}</button>`).join('')}
+    </div>
+    <div class="banner">${ico('shield')}<div><b>${S.privacy.adblock === 'off' ? 'Blocking is off' : 'Blocking is active'}</b><span>${S.privacy.adblock === 'balanced' ? 'Ads, trackers and annoying overlays are hidden on supported pages.' : S.privacy.adblock === 'strict' ? 'Adds fingerprinting scripts and social widgets to the block list.' : S.privacy.adblock === 'aggressive' ? 'Blocks aggressive interstitials, telemetry and known crypto-miners.' : 'Nothing is filtered while blocking is off.'} Frames from other origins are filtered by the browser engine, not by this page.</span></div></div>
+
+    <div class="list">
+      ${toggleRow({ title: 'Safe Browsing', sub: 'Warn before dangerous sites and downloads', path: 'privacy.safeBrowsing', checked: S.privacy.safeBrowsing })}
+      ${toggleRow({ title: 'Do Not Track', sub: 'Ask sites not to track you across visits', path: 'privacy.dnt', checked: S.privacy.dnt })}
+      ${toggleRow({ title: 'HTTPS-only', sub: 'Upgrade typed addresses to https', path: 'privacy.httpsOnly', checked: S.privacy.httpsOnly })}
+      ${toggleRow({ title: 'Block third-party cookies', sub: 'Sites can only read their own cookies', path: 'privacy.cookies', checked: S.privacy.cookies })}
+    </div>
+
+    <div class="section-label">Custom filters ${planLock('premium')}</div>
+    <div class="list">
+      <div class="field">
+        <label>One rule per line</label>
+        <textarea data-input="privacy.filters" ${can('premium') ? '' : 'disabled'} placeholder="||ads.example.com^&#10;example.com##.sponsored">${esc(S.privacy.filters)}</textarea>
+        <span class="hint">Cosmetic rules use <code>domain##selector</code>; network rules use <code>||host^</code>.</span>
+      </div>
+      <div class="chips"><span class="perm">${(S.privacy.filters || '').split('\n').filter(Boolean).length} custom rules</span></div>
+    </div>
+
+    <button class="ghost-btn" data-act="clearData">Clear history and cookies</button>`
+});
+
+
+'use strict';
+/* ============================================================
+   Titanium — panels part 2: VPN, history, delegation, account,
+   plans, extensions, about, shortcuts
+   ============================================================ */
+
+/* ---------------- VPN ---------------- */
+PANELS.vpn = () => {
+  const visible = SERVERS.filter((s) => can(s.need) || s.id === 'auto');
+  return {
+    title: 'VPN',
+    html: `
+      <div class="plan ${S.vpn.on ? 'current' : ''}">
+        <div class="plan-top">
+          <div>
+            <h3>${S.vpn.on ? 'Connected' : 'Not connected'}</h3>
+            <small style="color:var(--muted)">${S.vpn.on ? serverName(S.vpn.server) + ' · ' + S.vpn.protocol : 'Your IP is exposed to every site you open'}</small>
+          </div>
+          <span class="dot ${S.vpn.on ? 'on' : ''}" style="width:12px;height:12px"></span>
+        </div>
+        <button class="accent-btn" style="align-self:stretch" data-act="vpnToggle">${S.vpn.on ? 'Disconnect' : 'Connect VPN'}</button>
+      </div>
+
+      <div class="banner">${ico('info')}<div><b>Simulated in this build</b><span>This single-file demo shows the full VPN surface — locations, protocols, kill switch — but it cannot create a real encrypted tunnel. A shipping Titanium would route through a WireGuard endpoint; see the README.</span></div></div>
+
+      <div class="section-label">Location · ${SERVERS.filter((s) => can(s.need)).length} available</div>
+      <div class="list">
+        ${SERVERS.map((s) => {
+          const locked = !can(s.need);
+          return `<button class="list-row" data-act="${locked ? 'paywall' : 'server'}" data-server="${s.id}" data-need="${locked ? s.need : ''}">
+            <span class="lr-icon" style="font-size:17px">${s.flag}</span>
+            <span class="lr-body"><b>${s.name}</b><small>${locked ? 'Locked on ' + PLANS[S.plan].name : s.id === 'auto' ? 'Picks the closest healthy node' : 'WireGuard · 1 Gbps'}</small></span>
+            ${locked ? '<span class="perm">' + (s.need === 'premium' ? 'Premium' : 'Ultimate') + '</span>' : S.vpn.server === s.id ? '<span class="perm" style="color:var(--accent)">Selected</span>' : '<span class="chev">›</span>'}
+          </button>`;
+        }).join('')}
+      </div>
+
+      <div class="section-label">Tunnel</div>
+      <div class="list">
+        <div class="field"><label>Protocol</label>
+          <select data-input="vpn.protocol">
+            <option value="wireguard" ${S.vpn.protocol === 'wireguard' ? 'selected' : ''}>WireGuard (fastest)</option>
+            <option value="openvpn" ${S.vpn.protocol === 'openvpn' ? 'selected' : ''}>OpenVPN (most compatible)</option>
+            <option value="ikev2" ${S.vpn.protocol === 'ikev2' ? 'selected' : ''}>IKEv2 (mobile)</option>
+          </select>
+        </div>
+        ${toggleRow({ title: 'Kill switch', sub: 'Drop traffic if the tunnel falls over', path: 'vpn.killSwitch', checked: S.vpn.killSwitch, need: 'premium' })}
+        ${toggleRow({ title: 'Split tunneling', sub: 'Choose which apps skip the VPN', path: 'vpn.split', checked: S.vpn.split, need: 'ultimate' })}
+      </div>`
+  };
+};
+
+/* ---------------- history ---------------- */
+PANELS.history = () => {
+  const items = S.history.items;
+  return {
+    title: 'History',
+    html: `
+      <div class="list">
+        ${toggleRow({ title: 'Save history', sub: 'Needed for suggestions and delegation', path: 'history.on', checked: S.history.on })}
+        ${toggleRow({ title: 'Private by default', sub: 'New tabs never record or delegate', path: 'history.incognito', checked: S.history.incognito })}
+      </div>
+
+      <div class="section-label">Keep history for</div>
+      <div class="chips">
+        ${[7, 90, 365].map((d) => {
+          const need = d > 90 ? 'ultimate' : d > 7 ? 'premium' : 'free';
+          return `<button class="chip ${can(need) ? '' : 'lock'}" data-act="retention" data-days="${d}" data-need="${need}" aria-pressed="${S.history.retention === d}">${d === 365 ? '1 year' : d + ' days'}</button>`;
+        }).join('')}
+      </div>
+
+      <div class="section-label">Entries · ${items.length}</div>
+      <div class="field" style="padding:0">
+        <input id="histSearch" type="text" placeholder="Filter history" autocomplete="off">
+      </div>
+      <div class="list" id="histList">
+        ${items.length ? items.slice(0, 200).map((h) => `<div class="list-row" data-hist-row data-text="${esc((h.title + ' ' + h.url).toLowerCase())}">
+          <span class="lr-icon" style="background:transparent">${brandMarkForUrl(h.url, 22, h.title)}</span>
+          <span class="lr-body"><b>${esc(h.title)}</b><small>${esc(h.url)} · ${timeAgo(h.ts)}</small></span>
+          <button class="mini-btn" data-act="openHist" data-url="${esc(h.url)}">Open</button>
+          <button class="mini-btn danger" data-act="deleteHist" data-id="${h.id}" aria-label="Delete">✕</button>
+        </div>`).join('') : `<div class="empty"><b>No history yet</b>Pages you visit will show up here.</div>`}
+      </div>
+
+      <div class="plan-actions">
+        <button class="mini-btn" data-act="clearHistory">Clear history</button>
+        <button class="mini-btn" data-act="sheet" data-panel="delegation">Delegate history</button>
+      </div>`,
+    bind: (root) => {
+      const search = $('#histSearch', root);
+      if (!search) return;
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        $$('[data-hist-row]', root).forEach((row) => {
+          row.hidden = q.length > 0 && !row.dataset.text.includes(q);
+        });
+      });
+    }
+  };
+};
+
+/* ---------------- delegation ---------------- */
+function b64uEncode(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64uDecode(str) {
+  const bin = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
+  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+function buildDelegationCode() {
+  const d = S.delegation.active;
+  if (!d) return '';
+  const items = S.history.items.slice(0, 200).map((h) => ({
+    title: h.title,
+    url: d.scope.urls ? h.url : '',
+    ts: h.ts
+  }));
+  const payload = {
+    v: 1,
+    app: 'titanium',
+    from: S.account?.name || 'Titanium',
+    created: d.createdAt,
+    expires: d.expiresAt,
+    scope: d.scope,
+    items
+  };
+  return 'TiD1.' + b64uEncode(JSON.stringify(payload));
+}
+
+function importDelegation(code) {
+  try {
+    const clean = String(code || '').trim();
+    if (!clean.startsWith('TiD1.')) return { ok: false, error: 'That is not a Titanium delegation code' };
+    const payload = JSON.parse(b64uDecode(clean.slice(5)));
+    if (payload.v !== 1 || payload.app !== 'titanium') return { ok: false, error: 'Unsupported delegation code version' };
+    if (payload.expires && payload.expires < Date.now()) return { ok: false, error: 'This delegation code has expired' };
+    const incoming = (payload.items || []).map((h) => ({
+      id: uid(),
+      url: h.url || 'delegated://' + encodeURIComponent(h.title || 'entry'),
+      title: h.title || 'Delegated entry',
+      ts: Number(h.ts) || Date.now(),
+      delegated: payload.from || true
+    }));
+    const known = new Set(S.history.items.map((h) => h.url + h.ts));
+    const fresh = incoming.filter((h) => !known.has(h.url + h.ts));
+    S.history.items = [...fresh, ...S.history.items].sort((a, b) => b.ts - a.ts).slice(0, 600);
+    S.delegation.log.unshift({ ts: Date.now(), text: `Imported ${fresh.length} entries from ${payload.from || 'a delegate'}` });
+    pruneHistory();
+    save();
+    renderHome();
+    return { ok: true, count: fresh.length };
+  } catch {
+    return { ok: false, error: 'Could not read that code — it may be truncated' };
+  }
+}
+
+PANELS.delegation = () => {
+  const d = S.delegation.active;
+  const expired = d && d.expiresAt < Date.now();
+  const code = d ? ($('#delegCode')?.textContent || d.code || '') : '';
+  return {
+    title: 'History delegation',
+    html: `
+      <p class="step-sub">Hand a scoped, expiring copy of your history to a person or another device. Codes are generated locally — no Titanium server ever sees them.</p>
+
+      ${d ? `
+        <div class="plan ${expired ? '' : 'current'}">
+          <div class="plan-top"><h3>${esc(d.label)}</h3><span class="price">${expired ? 'Expired' : 'Active'}</span></div>
+          <ul>
+            <li class="${d.scope.titles ? '' : 'off'}">Page titles</li>
+            <li class="${d.scope.urls ? '' : 'off'}">Full URLs</li>
+            <li class="${d.scope.downloads ? '' : 'off'}">Download list</li>
+            <li>Expires ${new Date(d.expiresAt).toLocaleDateString()} · ${Math.max(0, Math.ceil((d.expiresAt - Date.now()) / 86400000))} days left</li>
+          </ul>
+          <div class="plan-actions">
+            <button class="mini-btn accent" data-act="delegateGenerate">${code ? 'Regenerate code' : 'Generate code'}</button>
+            <button class="mini-btn" data-act="copy" data-target="delegCode">Copy</button>
+            <button class="mini-btn danger" data-act="delegateRevoke">Revoke</button>
+          </div>
+        </div>
+        <div id="delegCode" class="code-box">${code ? esc(code) : 'No code generated yet — tap Generate code to bundle ' + S.history.items.length + ' entries.'}</div>
+      ` : `
+        <div class="list">
+          <div class="field"><label>Delegate name</label><input id="delegName" type="text" placeholder="Sam — family iPad" value="${esc(S.delegation.pending.label)}"></div>
+          <div class="list-row"><span class="lr-body"><b>Scope</b><small>Grant the minimum you need</small></span></div>
+          <div class="chips">
+            ${['titles', 'urls', 'downloads'].map((k) => `<button class="chip" data-act="delegScope" data-scope="${k}" aria-pressed="${S.delegation.pending.scope[k]}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}
+          </div>
+        </div>
+        <div class="banner">${ico('lock')}<div><b>Delegation needs Premium</b><span>Free profiles can export a history file; Premium and Ultimate can issue expiring codes and delegate to other devices.</span></div></div>
+        <button class="accent-btn" data-act="delegateCreate">Create delegation</button>
+      `}
+
+      <div class="section-label">Import from another device</div>
+      <div class="field">
+        <textarea id="importCode" placeholder="TiD1.…"></textarea>
+        <span class="hint">Paste a code you were given. Expired codes are rejected.</span>
+      </div>
+      <button class="mini-btn accent" data-act="delegateImport">Import code</button>
+
+      <div class="section-label">Access log</div>
+      <div class="list">
+        ${S.delegation.log.length ? S.delegation.log.slice(0, 8).map((l) => `<div class="list-row"><span class="lr-body"><b style="font-weight:500;font-size:13px">${esc(l.text)}</b><small>${new Date(l.ts).toLocaleString()}</small></span></div>`).join('') : '<div class="empty">No delegation activity yet.</div>'}
+      </div>`
+  };
+};
+
+/* ---------------- account ---------------- */
+PANELS.account = () => {
+  const a = S.account;
+  return {
+    title: 'Account',
+    html: a ? `
+      <div class="list-row" style="border:1px solid var(--line);border-radius:14px;padding:16px">
+        <span class="lr-icon" style="width:48px;height:48px;border-radius:14px;background:hsl(${hueFor(a.name)} 45% 40%);color:#fff;font-weight:800;font-size:18px">${esc(a.name[0].toUpperCase())}</span>
+        <span class="lr-body"><b>${esc(a.name)}${a.guest ? ' · guest' : ''}</b><small>${esc(a.email || 'No email set')} · member since ${new Date(a.createdAt).toLocaleDateString()}</small></span>
+        <span class="perm">${PLANS[S.plan].name}</span>
+      </div>
+      <div class="list">
+        <div class="field"><label>Display name</label><input id="acctName" type="text" value="${esc(a.name)}" maxlength="40"></div>
+        <div class="field"><label>Email</label><input id="acctEmail" type="email" value="${esc(a.email)}" placeholder="you@example.com"></div>
+        <div class="chips"><button class="mini-btn accent" data-act="accountSave">Save profile</button><button class="mini-btn" data-act="sheet" data-panel="plans">Manage plan</button></div>
+      </div>
+      <div class="section-label">This device</div>
+      <div class="list">
+        <div class="list-row"><span class="lr-icon">${ico(S.device === 'mobile' ? 'mobile' : 'monitor')}</span><span class="lr-body"><b>${deviceName()} · this browser</b><small>Last active now · local session</small></span><span class="dot on"></span></div>
+        <div class="list-row"><span class="lr-icon">${ico('download')}</span><span class="lr-body"><b>Export my data</b><small>Settings, history and shortcuts as JSON</small></span><button class="mini-btn" data-act="exportData">Export</button></div>
+      </div>
+      <div class="list">
+        <button class="list-row" data-act="signout"><span class="lr-icon">${ico('power')}</span><span class="lr-body"><b>Sign out of this profile</b><small>Keeps history and settings on the device</small></span></button>
+        <button class="list-row" data-act="reset"><span class="lr-icon" style="color:var(--danger)">${ico('trash')}</span><span class="lr-body"><b>Delete local profile</b><small>Removes everything Titanium stored</small></span></button>
+      </div>
+    ` : `
+      <p class="step-sub">Titanium profiles are local. Nothing is uploaded and there is no password to forget.</p>
+      <div class="list">
+        <div class="field"><label>Display name</label><input id="newName" type="text" placeholder="Alex Rivera" maxlength="40"></div>
+        <div class="field"><label>Email (optional)</label><input id="newEmail" type="email" placeholder="you@example.com"></div>
+        <div class="chips"><button class="mini-btn accent" data-act="accountCreate">Create profile</button></div>
+      </div>`
+  };
+};
+
+/* ---------------- plans ---------------- */
+const PLAN_FEATURES = {
+  free: {
+    yes: ['All 15 search engines with real icons', 'Every theme, accent and layout control', 'Balanced ad & tracker blocking', 'Safe Browsing', '3 VPN locations', '2 Chrome extensions', '7-day history', '4 shortcuts', 'Mobile + desktop layouts'],
+    no: ['Strict blocking & custom filters', 'Delegation codes', 'Kill switch', 'Split tunneling']
+  },
+  premium: {
+    yes: ['Everything in Free', 'Strict blocking + custom filter rules', '12 VPN locations + kill switch', '10 Chrome extensions', '90-day history', 'History delegation (1 delegate)', '12 shortcuts', '20 tabs'],
+    no: ['Aggressive blocking', 'Split tunneling', 'Custom search engine']
+  },
+  ultimate: {
+    yes: ['Everything in Premium', 'Aggressive blocking + miner protection', 'All 16 VPN locations + split tunneling', 'Unlimited extensions', '1-year history', 'Up to 5 delegates', 'Custom search engine', 'Unlimited tabs', 'Priority support'],
+    no: []
+  }
+};
+
+PANELS.plans = () => ({
+  title: 'Plans',
+  html: `
+    <p class="step-sub">Start free forever. Upgrade when the limits start to pinch — downgrade any time, and your local data always comes with you.</p>
+    ${['free', 'premium', 'ultimate'].map((id) => {
+      const p = PLANS[id];
+      const f = PLAN_FEATURES[id];
+      const current = S.plan === id;
+      return `<div class="plan ${current ? 'current' : ''}">
+        <div class="plan-top">
+          <div><h3>${p.name}</h3><small style="color:var(--muted)">${p.blurb}</small></div>
+          <span class="price">${p.price}<span style="color:var(--muted);font-weight:500"> /${p.per}</span></span>
+        </div>
+        <ul>${f.yes.map((x) => `<li>${esc(x)}</li>`).join('')}${f.no.map((x) => `<li class="off">${esc(x)}</li>`).join('')}</ul>
+        <div class="plan-actions">
+          ${current ? '<button class="mini-btn" disabled>Current plan</button>' : `<button class="mini-btn accent" data-act="upgrade" data-plan="${id}">${RANK[id] > RANK[S.plan] ? 'Upgrade to ' + p.name : 'Switch to ' + p.name}</button>`}
+          ${id !== 'free' && !current ? '<button class="mini-btn" data-act="sheet" data-panel="about">What is included?</button>' : ''}
+        </div>
+      </div>`;
+    }).join('')}
+    <div class="banner">${ico('info')}<div><b>Demo checkout</b><span>No card, no charge. Picking a plan flips the local entitlement flag so you can try every gated feature; a real build would verify a receipt from the store.</span></div></div>`
+});
+
+/* ---------------- extensions ---------------- */
+PANELS.extensions = () => ({
+  title: 'Extensions',
+  html: window.Ext ? Ext.panelHTML() : '<div class="empty"><b>Extension host loading…</b></div>',
+  bind: (root) => { if (window.Ext) Ext.bind(root); }
+});
+
+/* ---------------- about ---------------- */
+PANELS.about = () => ({
+  title: 'About',
+  html: `
+    <div class="list-row" style="border:1px solid var(--line);border-radius:14px;padding:16px">
+      <span class="lr-icon" style="width:46px;height:46px;border-radius:14px;font-weight:800;font-size:15px;color:var(--accent)">Ti</span>
+      <span class="lr-body"><b>Titanium ${VERSION}</b><small>Single-file browser · MIT licence · open source</small></span>
+    </div>
+    <p class="step-sub">Titanium is a browsing surface that fits in one HTML file: a start page, tabbed navigation, 15 search engines, ad blocking controls, a VPN surface, extension loading, history with delegation, and three plans. Every byte of state lives in your browser's localStorage.</p>
+    <div class="section-label">What's inside</div>
+    <ul style="margin:0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.9">
+      <li>Five-question onboarding, device-adaptive layout</li>
+      <li>Tabs with back stack, voice search, shortcuts</li>
+      <li>15 engines + custom engine (Ultimate)</li>
+      <li>Ad blocking levels, custom filters, Safe Browsing</li>
+      <li>VPN location picker, protocol, kill switch</li>
+      <li>History retention, private-by-default, delegation codes</li>
+      <li>Chrome extension loader (.zip, .crx, unpacked folder)</li>
+      <li>Free / Premium / Ultimate entitlements</li>
+    </ul>
+    <div class="section-label">Honest limits</div>
+    <div class="banner">${ico('info')}<div><b>What one HTML file can't do</b><span>It can't create a real encrypted VPN tunnel, strip a site's anti-embedding headers, or run Chrome's background service workers. Those need a native shell or a browser extension build — the README explains the path for each.</span></div></div>
+    <div class="section-label">Credits</div>
+    <div class="list">
+      <a class="list-row" href="source.html" target="_blank" rel="noopener"><span class="lr-icon">${ico('code')}</span><span class="lr-body"><b>Source code</b><small>Every file, editable and downloadable</small></span><span class="chev">›</span></a>
+      <a class="list-row" href="https://github.com/your-username/titanium" target="_blank" rel="noopener"><span class="lr-icon">${ico('download')}</span><span class="lr-body"><b>Project on GitHub</b><small>Issues, roadmap and contributing</small></span><span class="chev">›</span></a>
+      <div class="list-row"><span class="lr-icon">${ico('shield')}</span><span class="lr-body"><b>Privacy</b><small>No analytics, no accounts server, no telemetry</small></span></div>
+      <div class="list-row"><span class="lr-icon">${ico('star')}</span><span class="lr-body"><b>MIT licence</b><small>Fork it, ship it, rename it</small></span></div>
+    </div>`
+});
+
+/* ---------------- shortcuts ---------------- */
+PANELS.shortcuts = () => ({
+  title: 'Start page shortcuts',
+  html: `
+    <p class="step-sub">Shortcuts appear under the search bar. Free keeps ${LIMITS ? '4' : '4'}, Premium 12, Ultimate 12.</p>
+    <div class="list">
+      ${S.shortcuts.length ? S.shortcuts.map((s, i) => `<div class="list-row">
+        <span class="lr-icon" style="background:transparent">${brandMarkForUrl(s.url, 22, s.name)}</span>
+        <span class="lr-body"><b>${esc(s.name)}</b><small>${esc(s.url)}</small></span>
+        <button class="mini-btn danger" data-act="shortcutDel" data-index="${i}">Remove</button>
+      </div>`).join('') : '<div class="empty">No shortcuts yet.</div>'}
+    </div>
+    <button class="accent-btn" data-act="shortcutAdd">Add shortcut</button>`
+});
+
+
+'use strict';
+/* ============================================================
+   Titanium — action dispatcher
+   ============================================================ */
+
+function paywall(need) {
+  const target = need || 'premium';
+  openModal(`<h3>${target === 'ultimate' ? 'Ultimate' : 'Premium'} feature</h3>
+    <p>This one is part of ${PLANS[target].name}. You're on ${PLANS[S.plan].name}. Switch plans instantly in this demo — no card, no charge.</p>
+    <div class="modal-actions">
+      <button class="ghost-btn" data-act="modalClose">Not now</button>
+      <button class="primary-btn" data-act="upgrade" data-plan="${target}">Try ${PLANS[target].name}</button>
+    </div>`);
+}
+
+const ACTIONS = {
+  sheet: (el) => openSheet(el.dataset.panel),
+  modalClose: () => closeModal(),
+  paywall: (el) => paywall(el.dataset.need),
+
+  toggle: (el) => {
+    const path = el.dataset.path;
+    if (el.dataset.need && !can(el.dataset.need)) { paywall(el.dataset.need); return; }
+    const next = !getPath(path);
+    setPath(path, next);
+    if (path === 'home.shortcuts') S.home.shortcuts = next;
+    save();
+    applySettings();
+    renderHome();
+    renderSheet(true);
+    toast(`${next ? 'On' : 'Off'} · ${path.split('.').pop()}`);
+  },
+
+  input: (el) => {
+    const path = el.dataset.input;
+    let value = el.type === 'range' ? Number(el.value) : el.value;
+
+    if (path === 'theme.accent') {
+      S.theme.accent = value;
+      S.theme.accentId = 'custom';
+      S.theme.preset = 'custom';
+      save(); applySettings(); renderSheet(true);
+      return;
+    }
+    if (path.startsWith('customEngine.')) {
+      if (!can('ultimate')) { paywall('ultimate'); return; }
+    }
+    if (path === 'theme.radius' || path === 'theme.font') {
+      setPath(path, value);
+      const out = el.parentElement.querySelector('output');
+      if (out) out.textContent = path === 'theme.radius' ? value + 'px' : value + 'px';
+      save(); applySettings();
+      return;
+    }
+    setPath(path, value);
+    save();
+    applySettings();
+    renderHome();
+    if (path === 'vpn.protocol') { toast('Protocol set to ' + value); renderSheet(true); }
+  },
+
+  theme: (el) => {
+    S.theme.mode = el.dataset.theme;
+    S.theme.preset = 'custom';
+    save(); applySettings(); renderSheet(true);
+  },
+
+  accent: (el) => {
+    const a = ACCENTS.find((x) => x.id === el.dataset.accent);
+    if (!a) return;
+    S.theme.accentId = a.id;
+    S.theme.accent = a.color;
+    S.theme.preset = 'custom';
+    save(); applySettings(); renderSheet(true);
+  },
+
+  preset: (el) => {
+    const preset = LOOK_PRESETS[el.dataset.preset];
+    if (!preset) return;
+    S.theme = { ...S.theme, ...preset, preset: el.dataset.preset };
+    save(); applySettings(); renderHome(); renderSheet(true);
+    toast(`${el.textContent} look applied`);
+  },
+
+  shape: (el) => {
+    S.theme.searchShape = el.dataset.shape;
+    save(); applySettings(); renderSheet(true);
+  },
+
+  iconStyle: (el) => {
+    S.theme.iconStyle = el.dataset.icons;
+    save(); applySettings(); renderSheet(true);
+  },
+
+  openSource: () => {
+    window.open('source.html', '_blank', 'noopener');
+  },
+
+  density: (el) => {
+    S.theme.density = el.dataset.density;
+    document.documentElement.dataset.density = S.theme.density;
+    save(); renderSheet(true);
+  },
+
+  device: (el) => {
+    S.device = el.dataset.device;
+    save(); applySettings(); renderSheet(true); renderHome();
+    toast(S.device === 'mobile' ? 'Mobile layout' : 'Desktop layout');
+  },
+
+  engine: (el) => {
+    S.engine = el.dataset.engine;
+    S.customEngine = { name: '', url: '' };
+    save(); renderHome(); renderSheet(true);
+    toast(`Searching with ${engine().name}`);
+  },
+
+  useCustom: () => {
+    if (!can('ultimate')) { paywall('ultimate'); return; }
+    if (!S.customEngine.name || !S.customEngine.url.includes('%s')) { toast('Add a name and a URL containing %s'); return; }
+    save(); renderHome(); renderSheet(true); toast(`Searching with ${S.customEngine.name}`);
+  },
+
+  clearCustom: () => {
+    S.customEngine = { name: '', url: '' };
+    save(); renderHome(); renderSheet(true);
+  },
+
+  adblock: (el) => {
+    const level = el.dataset.level;
+    const need = level === 'aggressive' ? 'ultimate' : level === 'strict' ? 'premium' : 'free';
+    if (!can(need)) { paywall(need); return; }
+    S.privacy.adblock = level;
+    save(); renderHome(); renderSheet(true);
+    toast(level === 'off' ? 'Ad blocking off' : `${level} blocking on`);
+  },
+
+  retention: (el) => {
+    if (el.dataset.need && !can(el.dataset.need)) { paywall(el.dataset.need); return; }
+    S.history.retention = Number(el.dataset.days);
+    pruneHistory(); save(); renderHome(); renderSheet(true);
+  },
+
+  server: (el) => {
+    S.vpn.server = el.dataset.server;
+    save(); renderHome(); renderSheet(true);
+    if (S.vpn.on) toast(`Reconnected to ${serverName(S.vpn.server)}`);
+  },
+
+  vpnToggle: () => {
+    if (!S.vpn.on) {
+      toast('Connecting…');
+      setTimeout(() => {
+        S.vpn.on = true; save(); renderHome();
+        if (sheetStack[sheetStack.length - 1] === 'vpn') renderSheet(true);
+        toast(`Tunnel up · ${serverName(S.vpn.server)} (simulated)`);
+      }, 700);
+      return;
+    }
+    S.vpn.on = false;
+    save(); renderHome();
+    if (sheetStack[sheetStack.length - 1] === 'vpn') renderSheet(true);
+    toast('VPN disconnected');
+  },
+
+  upgrade: (el) => {
+    const id = el.dataset.plan;
+    if (id === S.plan) { closeModal(); return; }
+    openModal(`<h3>Switch to ${PLANS[id].name}?</h3>
+      <p>${PLANS[id].price}/${PLANS[id].per} in a real build. In this demo the plan flips instantly and every gated feature unlocks — nothing is charged and no card is collected.</p>
+      <div class="modal-actions"><button class="ghost-btn" data-act="modalClose">Cancel</button><button class="primary-btn" data-act="confirmPlan" data-plan="${id}">Use ${PLANS[id].name}</button></div>`);
+  },
+
+  confirmPlan: (el) => {
+    const id = el.dataset.plan;
+    S.plan = id;
+    S.history.retention = Math.min(S.history.retention, LIMITS.retention[id]);
+    if (!can('premium')) S.history.retention = Math.min(S.history.retention, LIMITS.retention.free);
+    pruneHistory();
+    save(); closeModal(); applySettings(); renderHome(); renderSheet(true);
+    toast(`${PLANS[id].name} active — everything unlocked`);
+  },
+
+  accountCreate: () => {
+    const name = $('#newName')?.value.trim();
+    const email = $('#newEmail')?.value.trim() || '';
+    if (!name) { toast('Add a display name'); return; }
+    S.account = { name, email, guest: false, createdAt: Date.now() };
+    save(); renderHome(); renderSheet(true); toast('Profile created');
+  },
+
+  accountSave: () => {
+    const name = $('#acctName')?.value.trim();
+    const email = $('#acctEmail')?.value.trim() || '';
+    if (!name) { toast('Add a display name'); return; }
+    S.account = { ...(S.account || { createdAt: Date.now() }), name, email };
+    save(); renderHome(); renderSheet(true); toast('Profile saved');
+  },
+
+  signout: () => {
+    S.account = null;
+    save(); renderHome(); renderSheet(true); toast('Signed out — history kept on device');
+  },
+
+  exportData: () => {
+    const blob = new Blob([JSON.stringify({ app: 'titanium', version: VERSION, exported: new Date().toISOString(), state: S }, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'titanium-export.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('Export downloaded');
+  },
+
+  openHist: (el) => { navigate(el.dataset.url); closeSheet(); },
+  deleteHist: (el) => {
+    S.history.items = S.history.items.filter((h) => h.id !== el.dataset.id);
+    save(); renderHome(); renderSheet(true);
+  },
+  clearHistory: () => {
+    openModal(`<h3>Clear history?</h3><p>Removes all ${S.history.items.length} entries from this device. Settings and shortcuts stay.</p>
+      <div class="modal-actions"><button class="ghost-btn" data-act="modalClose">Cancel</button><button class="primary-btn" data-act="confirmClearHistory">Clear</button></div>`);
+  },
+  confirmClearHistory: () => {
+    S.history.items = [];
+    S.delegation.log.unshift({ ts: Date.now(), text: 'History cleared by you' });
+    save(); closeModal(); renderHome(); renderSheet(true); toast('History cleared');
+  },
+
+  clearData: () => {
+    S.history.items = [];
+    S.delegation.log.unshift({ ts: Date.now(), text: 'Cookies and history cleared' });
+    save(); renderHome(); renderSheet(true); toast('History and cookie state cleared');
+  },
+
+  delegScope: (el) => {
+    const k = el.dataset.scope;
+    S.delegation.pending.scope[k] = !S.delegation.pending.scope[k];
+    save(); renderSheet(true);
+  },
+  delegateCreate: () => {
+    if (!can('premium')) { paywall('premium'); return; }
+    const label = $('#delegName')?.value.trim() || 'Trusted device';
+    S.delegation.pending.label = label;
+    S.delegation.active = {
+      label,
+      scope: { ...S.delegation.pending.scope },
+      createdAt: Date.now(),
+      expiresAt: Date.now() + S.delegation.pending.days * 86400000,
+      code: null
+    };
+    S.delegation.log.unshift({ ts: Date.now(), text: `Delegation granted to ${label}` });
+    save(); renderSheet(true);
+    toast('Delegation created');
+  },
+  delegateGenerate: () => {
+    if (!S.delegation.active) return;
+    const code = buildDelegationCode();
+    S.delegation.active.code = code;
+    S.delegation.log.unshift({ ts: Date.now(), text: `Code generated for ${S.delegation.active.label}` });
+    save(); renderSheet(true);
+    toast(`Code ready · ${S.history.items.length} entries`);
+  },
+  delegateRevoke: () => {
+    if (!S.delegation.active) return;
+    S.delegation.log.unshift({ ts: Date.now(), text: `Delegation revoked for ${S.delegation.active.label}` });
+    S.delegation.active = null;
+    save(); renderSheet(true); toast('Delegation revoked');
+  },
+  delegateImport: () => {
+    const code = $('#importCode')?.value || '';
+    const res = importDelegation(code);
+    if (!res.ok) { toast(res.error); return; }
+    renderSheet(true); toast(`Imported ${res.count} entries`);
+  },
+
+  copy: async (el) => {
+    const node = document.getElementById(el.dataset.target);
+    if (!node) return;
+    try { await navigator.clipboard.writeText(node.textContent.trim()); toast('Copied'); }
+    catch { toast('Copy failed — select the code and copy manually'); }
+  },
+
+  switchTab: (el) => { switchTab(el.dataset.id); closeSheet(); },
+  closeTab: (el) => {
+    closeTab(el.dataset.id);
+    if (!tabs.length) return;
+    renderSheet(true);
+  },
+  newtab: () => { newTab(); closeSheet(); },
+  closeOthers: () => {
+    tabs = tabs.filter((t) => t.id === activeId);
+    renderTopbar(); renderSheet(true); toast('Other tabs closed');
+  },
+
+  shortcutAdd: () => addShortcutDialog(),
+  shortcutDel: (el) => {
+    S.shortcuts.splice(Number(el.dataset.index), 1);
+    save(); renderHome(); renderSheet(true);
+  },
+
+  resetLook: () => {
+    S.theme = structuredClone(DEFAULT_STATE.theme);
+    save(); applySettings(); renderSheet(true); toast('Look reset');
+  },
+
+  reset: () => {
+    openModal(`<h3>Reset Titanium?</h3><p>This wipes the local profile, history, shortcuts, extensions and settings. The page reloads into onboarding.</p>
+      <div class="modal-actions"><button class="ghost-btn" data-act="modalClose">Cancel</button><button class="primary-btn" data-act="confirmReset">Reset everything</button></div>`);
+  },
+  confirmReset: async () => {
+    localStorage.removeItem(LS_KEY);
+    try {
+      const dbs = await indexedDB.databases?.();
+      (dbs || []).forEach((d) => d.name && indexedDB.deleteDatabase(d.name));
+    } catch { /* ignore */ }
+    location.reload();
+  }
+};
+
+window.ACTIONS = ACTIONS;
+
+
+'use strict';
+/* ============================================================
+   Titanium — Chrome extension host
+   Loads .zip / .crx / unpacked folders, reads manifest.json,
+   renders the extension popup in a sandboxed frame and answers
+   a chrome.* compatibility shim over postMessage.
+   ============================================================ */
+
+const Ext = {
+  items: [],
+  ready: false,
+  DB: 'titanium-ext',
+  STORE: 'ext',
+  MAX_BYTES: 3 * 1024 * 1024
+};
+
+/* ---------- base64 <-> bytes ---------- */
+function bytesToB64(u8) {
+  let bin = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < u8.length; i += chunk) bin += String.fromCharCode.apply(null, u8.subarray(i, i + chunk));
+  return btoa(bin);
+}
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8;
+}
+const decodeText = (u8) => new TextDecoder().decode(u8);
+
+/* ---------- zip reader (stored + deflate) ---------- */
+async function unzip(buffer) {
+  const u8 = new Uint8Array(buffer);
+  const dv = new DataView(buffer);
+  if (u8.length < 22) throw new Error('File is too small to be an archive');
+  let eocd = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 66000); i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error('Not a valid ZIP or CRX file');
+  const count = dv.getUint16(eocd + 10, true);
+  let off = dv.getUint32(eocd + 16, true);
+  const files = {};
+  let total = 0;
+  for (let i = 0; i < count; i++) {
+    if (dv.getUint32(off, true) !== 0x02014b50) break;
+    const method = dv.getUint16(off + 10, true);
+    const compSize = dv.getUint32(off + 20, true);
+    const nameLen = dv.getUint16(off + 28, true);
+    const extraLen = dv.getUint16(off + 30, true);
+    const commentLen = dv.getUint16(off + 32, true);
+    const localOff = dv.getUint32(off + 42, true);
+    const name = decodeText(u8.subarray(off + 46, off + 46 + nameLen));
+    off += 46 + nameLen + extraLen + commentLen;
+    if (name.endsWith('/')) continue;
+    const lnameLen = dv.getUint16(localOff + 26, true);
+    const lextraLen = dv.getUint16(localOff + 28, true);
+    const start = localOff + 30 + lnameLen + lextraLen;
+    const comp = u8.subarray(start, start + compSize);
+    total += compSize;
+    if (total > Ext.MAX_BYTES) throw new Error('Extension is larger than 3 MB');
+    let content;
+    if (method === 0) content = comp;
+    else if (method === 8) {
+      const stream = new Blob([comp]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      content = new Uint8Array(await new Response(stream).arrayBuffer());
+    } else continue;
+    files[name] = content;
+  }
+  return files;
+}
+
+function stripCrx(buffer) {
+  const u8 = new Uint8Array(buffer);
+  if (u8[0] === 0x43 && u8[1] === 0x72 && u8[2] === 0x32 && u8[3] === 0x34) {
+    const dv = new DataView(buffer);
+    const version = dv.getUint32(4, true);
+    if (version === 3) return buffer.slice(12 + dv.getUint32(8, true));
+    return buffer.slice(16 + dv.getUint32(8, true) + dv.getUint32(12, true));
+  }
+  return buffer;
+}
+
+/* ---------- IndexedDB ---------- */
+function idb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(Ext.DB, 1);
+    req.onupgradeneeded = () => {
+      if (!req.result.objectStoreNames.contains(Ext.STORE)) req.result.createObjectStore(Ext.STORE, { keyPath: 'id' });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbAll() {
+  const db = await idb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(Ext.STORE, 'readonly').objectStore(Ext.STORE).getAll();
+    tx.onsuccess = () => resolve(tx.result || []);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function idbPut(record) {
+  const db = await idb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(Ext.STORE, 'readwrite').objectStore(Ext.STORE).put(record);
+    tx.onsuccess = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function idbDel(id) {
+  const db = await idb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(Ext.STORE, 'readwrite').objectStore(Ext.STORE).delete(id);
+    tx.onsuccess = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+/* ---------- manifest helpers ---------- */
+function i18nName(manifest, files) {
+  let name = manifest.name || 'Unnamed extension';
+  if (/^__MSG_(.+)__$/.test(name)) {
+    const key = name.replace(/^__MSG_|__$/g, '');
+    const locale = manifest.default_locale || 'en';
+    const candidates = [`_locales/${locale}/messages.json`, '_locales/en/messages.json'];
+    for (const path of candidates) {
+      const data = files[path];
+      if (!data) continue;
+      try {
+        const messages = JSON.parse(decodeText(data));
+        const entry = messages[key] || messages[key.toLowerCase()];
+        if (entry) {
+          name = typeof entry === 'string' ? entry : entry.message;
+          break;
+        }
+      } catch { /* keep raw name */ }
+    }
+  }
+  return name;
+}
+
+function pickIcon(manifest, files) {
+  const icons = manifest.icons || {};
+  const sizes = Object.keys(icons).map(Number).sort((a, b) => b - a);
+  for (const size of sizes) {
+    const p = icons[size];
+    if (files[p]) return 'data:image/png;base64,' + bytesToB64(files[p]);
+  }
+  return '';
+}
+
+function permissionList(manifest) {
+  const perms = [...(manifest.permissions || []), ...(manifest.host_permissions || [])];
+  const opt = manifest.optional_permissions || [];
+  return { perms: [...new Set([...perms, ...opt])].slice(0, 12), all: perms.length };
+}
+
+/* ---------- build an extension record ---------- */
+async function recordFromFiles(fileMap, sourceLabel) {
+  let manifestPath = 'manifest.json';
+  if (!fileMap[manifestPath]) {
+    const nested = Object.keys(fileMap).find((p) => p.endsWith('/manifest.json') && p.split('/').length <= 3);
+    if (!nested) throw new Error('No manifest.json found — is this a Chrome extension?');
+    manifestPath = nested;
+    const prefix = nested.slice(0, -'manifest.json'.length);
+    const trimmed = {};
+    for (const [p, v] of Object.entries(fileMap)) trimmed[p.replace(new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), '')] = v;
+    fileMap = trimmed;
+  }
+  let manifest;
+  try { manifest = JSON.parse(decodeText(fileMap['manifest.json'])); }
+  catch { throw new Error('manifest.json could not be parsed'); }
+
+  const files = {};
+  let bytes = 0;
+  for (const [path, data] of Object.entries(fileMap)) {
+    bytes += data.length;
+    files[path] = bytesToB64(data);
+  }
+  if (bytes > Ext.MAX_BYTES) throw new Error('Extension is larger than 3 MB');
+
+  const id = 'ext' + uid();
+  return {
+    id,
+    name: i18nName(manifest, fileMap).slice(0, 60),
+    version: manifest.version || '0.0.0',
+    description: (manifest.description || 'No description').slice(0, 220),
+    manifestVersion: manifest.manifest_version || 2,
+    manifest,
+    permissions: permissionList(manifest).perms,
+    popupPath: (manifest.action && manifest.action.default_popup) || (manifest.browser_action && manifest.browser_action.default_popup) || '',
+    icon: pickIcon(manifest, fileMap),
+    contentScripts: (manifest.content_scripts || []).map((cs) => (cs.matches || []).join(', ')).slice(0, 3),
+    files,
+    enabled: true,
+    source: sourceLabel || 'local file',
+    installedAt: Date.now()
+  };
+}
+
+/* ---------- chrome shim for the popup frame ---------- */
+function shimFor(record) {
+  const messages = {};
+  const locales = Object.keys(record.files).filter((p) => p.startsWith('_locales/') && p.endsWith('/messages.json'));
+  for (const path of locales) {
+    try {
+      const parsed = JSON.parse(decodeText(b64ToBytes(record.files[path])));
+      for (const [k, v] of Object.entries(parsed)) messages[k] = typeof v === 'string' ? v : v.message || '';
+    } catch { /* ignore broken locale */ }
+  }
+  const safe = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c');
+  return `
+(function(){
+  const MANIFEST = ${safe(record.manifest)};
+  const MESSAGES = ${safe(messages)};
+  const pending = new Map(); let seq = 0;
+  function call(method, args){
+    return new Promise(function(resolve, reject){
+      const id = ++seq; pending.set(id, {resolve: resolve, reject: reject});
+      parent.postMessage({ ti: 'ext-call', id: id, method: method, args: args || [] }, '*');
+    });
+  }
+  addEventListener('message', function(e){
+    const d = e.data || {};
+    if (d.ti !== 'ext-reply' || !pending.has(d.id)) return;
+    const p = pending.get(d.id); pending.delete(d.id);
+    if (d.error) p.reject(new Error(d.error)); else p.resolve(d.result);
+  });
+  function storage(){
+    return {
+      get: function(k){ return call('storage.get', [k]); },
+      set: function(o){ return call('storage.set', [o]); },
+      remove: function(k){ return call('storage.remove', [k]); },
+      clear: function(){ return call('storage.clear', []); }
+    };
+  }
+  const chrome = {
+    runtime: {
+      id: ${safe(record.id)},
+      getManifest: function(){ return MANIFEST; },
+      getURL: function(p){ return p; },
+      sendMessage: function(){ return Promise.resolve(undefined); },
+      onMessage: { addListener: function(){}, removeListener: function(){} },
+      onInstalled: { addListener: function(){} },
+      lastError: undefined
+    },
+    storage: { local: storage(), sync: storage(), session: storage() },
+    tabs: {
+      query: function(q){ return call('tabs.query', [q]); },
+      create: function(o){ return call('tabs.create', [o]); },
+      update: function(id, o){ return call('tabs.update', [id, o]); }
+    },
+    i18n: { getMessage: function(k){ return MESSAGES[k] || ''; } },
+    action: { setBadgeText: function(){}, setBadgeBackgroundColor: function(){}, onClicked: { addListener: function(){} } },
+    permissions: { contains: function(){ return Promise.resolve(true); }, request: function(){ return Promise.resolve(true); } }
+  };
+  window.chrome = chrome;
+  window.browser = chrome;
+})();`;
+}
+
+function popupDocument(record) {
+  const raw = record.files[record.popupPath];
+  if (!raw) return null;
+  let html = decodeText(b64ToBytes(raw));
+  const dir = record.popupPath.includes('/') ? record.popupPath.slice(0, record.popupPath.lastIndexOf('/') + 1) : '';
+  const read = (p) => {
+    const clean = p.replace(/^\.\//, '').replace(/^\//, '');
+    const candidate = record.files[dir + clean] || record.files[clean];
+    return candidate ? decodeText(b64ToBytes(candidate)) : '';
+  };
+  html = html.replace(/<link[^>]+rel=["']?stylesheet["']?[^>]*>/gi, (tag) => {
+    const m = tag.match(/href=["']([^"']+)["']/i);
+    if (!m || /^(https?:)?\/\//i.test(m[1])) return tag;
+    const css = read(m[1]);
+    return css ? `<style>${css}</style>` : tag;
+  });
+  html = html.replace(/<script([^>]*)\ssrc=["']([^"']+)["']([^>]*)><\/script>/gi, (tag, pre, src, post) => {
+    if (/^(https?:)?\/\//i.test(src)) return tag;
+    const js = read(src);
+    return js ? `<script${pre}${post}>${js}<\/script>` : tag;
+  });
+  html = html.replace(/(<img[^>]+src=["'])([^"']+)(["'])/gi, (tag, a, src, b) => {
+    if (/^(https?:|data:)/i.test(src)) return tag;
+    const data = record.files[dir + src.replace(/^\.\//, '')];
+    return data ? `${a}data:image/png;base64,${data}${b}` : tag;
+  });
+  const shim = `<script>${shimFor(record)}<\/script>`;
+  if (/<head[^>]*>/i.test(html)) html = html.replace(/<head[^>]*>/i, (m) => m + shim);
+  else html = shim + html;
+  const base = '<base target="_blank">';
+  return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => m + base) : base + html;
+}
+
+/* ---------- chrome.* RPC ---------- */
+function extStoreKey(id) { return 'ti.extdata.' + id; }
+function readExtStore(id) {
+  try { return JSON.parse(localStorage.getItem(extStoreKey(id)) || '{}'); } catch { return {}; }
+}
+function writeExtStore(id, data) {
+  try { localStorage.setItem(extStoreKey(id), JSON.stringify(data)); } catch { toast('Extension storage is full'); }
+}
+
+function extStorageGet(id, keys) {
+  const all = readExtStore(id);
+  if (keys == null) return all;
+  if (typeof keys === 'string') return { [keys]: all[keys] };
+  if (Array.isArray(keys)) {
+    const out = {};
+    keys.forEach((k) => { out[k] = all[k]; });
+    return out;
+  }
+  const out = { ...keys };
+  Object.keys(keys).forEach((k) => { if (k in all) out[k] = all[k]; });
+  return out;
+}
+
+async function handleExtCall(id, method, args) {
+  if (method.startsWith('storage.')) {
+    const all = readExtStore(id);
+    if (method === 'storage.get') return extStorageGet(id, args[0]);
+    if (method === 'storage.set') { writeExtStore(id, { ...all, ...(args[0] || {}) }); return undefined; }
+    if (method === 'storage.remove') {
+      const keys = Array.isArray(args[0]) ? args[0] : [args[0]];
+      keys.forEach((k) => delete all[k]);
+      writeExtStore(id, all);
+      return undefined;
+    }
+    if (method === 'storage.clear') { writeExtStore(id, {}); return undefined; }
+  }
+  if (method === 'tabs.query') {
+    const t = activeTab();
+    return [{ id: 1, active: true, url: t.url || 'titanium://start', title: t.url ? hostOf(t.url) : 'New tab', windowId: 1 }];
+  }
+  if (method === 'tabs.create') { newTab((args[0] || {}).url || null); return { id: tabs.length }; }
+  if (method === 'tabs.update') { navigate(args[1]?.url || 'about:blank'); return { id: 1 }; }
+  throw new Error('chrome.' + method + ' is not available in this build');
+}
+
+window.addEventListener('message', async (e) => {
+  const d = e.data || {};
+  if (d.ti !== 'ext-call') return;
+  const frame = document.querySelector('iframe[data-ext]');
+  if (!frame || e.source !== frame.contentWindow) return;
+  try {
+    const result = await handleExtCall(frame.dataset.ext, d.method, d.args || []);
+    e.source.postMessage({ ti: 'ext-reply', id: d.id, result }, '*');
+  } catch (err) {
+    e.source.postMessage({ ti: 'ext-reply', id: d.id, error: String(err && err.message || err) }, '*');
+  }
+});
+
+/* ---------- install ---------- */
+async function installExtension(fileMap, sourceLabel) {
+  const cap = LIMITS.extensions[S.plan] || 2;
+  if (Ext.items.length >= cap) {
+    paywall(S.plan === 'free' ? 'premium' : 'ultimate');
+    throw new Error(`Your plan allows ${cap} extensions`);
+  }
+  const record = await recordFromFiles(fileMap, sourceLabel);
+  await idbPut(record);
+  Ext.items.push(record);
+  save();
+  renderSheet(true);
+  toast(`${record.name} installed`);
+}
+
+async function installFromFile(file) {
+  const buffer = await file.arrayBuffer();
+  const zip = stripCrx(buffer);
+  const files = await unzip(zip);
+  await installExtension(files, file.name);
+}
+
+async function installFromFolder(fileList) {
+  const files = {};
+  for (const file of fileList) {
+    const path = (file.webkitRelativePath || file.name).split('/').slice(1).join('/') || file.name;
+    files[path] = new Uint8Array(await file.arrayBuffer());
+  }
+  await installExtension(files, 'unpacked folder');
+}
+
+/* ---------- UI ---------- */
+Ext.panelHTML = () => {
+  const cap = LIMITS.extensions[S.plan];
+  const capLabel = cap === Infinity ? 'unlimited' : cap;
+  return `
+    <div class="banner">${ico('puzzle')}<div><b>Chrome extensions, loaded locally</b><span>Drop in a <code>.crx</code> or <code>.zip</code> from the Chrome Web Store, or point at an unpacked folder. Titanium reads manifest.json, renders the popup and answers <code>chrome.storage</code>, <code>chrome.runtime</code> and <code>chrome.tabs</code> through a compatibility shim.</span></div></div>
+
+    <div class="banner">${ico('info')}<div><b>What can't run in one HTML file</b><span>MV3 background service workers and content scripts injected into cross-origin sites need Chrome's process model. Extension popups, storage, options pages and tab metadata do work. Pages load inside a sandbox, so review what you install.</span></div></div>
+
+    <div class="plan-actions">
+      <button class="mini-btn accent" data-ext="add">Add extension (.crx / .zip)</button>
+      <button class="mini-btn" data-ext="folder">Load unpacked</button>
+      <span class="perm">${Ext.items.length} / ${capLabel} used · ${S.plan}</span>
+    </div>
+    <input type="file" id="extFile" accept=".crx,.zip,application/zip" hidden>
+    <input type="file" id="extFolder" webkitdirectory directory multiple hidden>
+
+    <div class="section-label">Installed</div>
+    ${Ext.items.length ? Ext.items.map((x) => `
+      <div class="ext-card">
+        <div class="ext-head">
+          <span class="ext-logo" style="background:transparent;overflow:hidden">${x.icon ? `<img src="${x.icon}" alt="" style="width:32px;height:32px">` : esc((x.name[0] || 'E').toUpperCase())}</span>
+          <span class="ext-body"><b>${esc(x.name)}</b><small>v${esc(x.version)} · MV${x.manifestVersion} · ${esc(x.source)}</small></span>
+          <button class="toggle" data-ext="toggle" data-id="${x.id}" aria-pressed="${x.enabled}" aria-label="Enable"></button>
+        </div>
+        <p style="margin:0;color:var(--muted);font-size:12.5px">${esc(x.description)}</p>
+        <div class="perm-list">${x.permissions.length ? x.permissions.map((p) => `<span class="perm">${esc(p)}</span>`).join('') : '<span class="perm">no special permissions</span>'}</div>
+        <div class="plan-actions">
+          ${x.popupPath ? `<button class="mini-btn accent" data-ext="popup" data-id="${x.id}">Open popup</button>` : '<span class="perm">no popup</span>'}
+          <button class="mini-btn danger" data-ext="remove" data-id="${x.id}">Remove</button>
+        </div>
+        ${x.contentScripts && x.contentScripts.length ? `<small style="color:var(--muted-2);font-size:11px">Content scripts declared for: ${esc(x.contentScripts.join(' · '))} (not injected by this build)</small>` : ''}
+      </div>`).join('') : `<div class="empty"><b>No extensions yet</b>Install a CRX or ZIP to see its popup run here.</div>`}
+
+    <p class="hint" style="color:var(--muted-2);font-size:11.5px">Extensions are stored in IndexedDB on this device. Removing one deletes its files and its chrome.storage data.</p>`;
+};
+
+Ext.bind = (root) => {
+  const fileInput = $('#extFile', root);
+  const folderInput = $('#extFolder', root);
+  $$('[data-ext]', root).forEach((node) => {
+    const kind = node.dataset.ext;
+    if (kind === 'add') node.addEventListener('click', () => fileInput.click());
+    if (kind === 'folder') node.addEventListener('click', () => folderInput.click());
+    if (kind === 'toggle') node.addEventListener('click', async () => {
+      const item = Ext.items.find((x) => x.id === node.dataset.id);
+      if (!item) return;
+      item.enabled = !item.enabled;
+      node.setAttribute('aria-pressed', String(item.enabled));
+      await idbPut(item);
+      toast(`${item.name} ${item.enabled ? 'enabled' : 'disabled'}`);
+    });
+    if (kind === 'remove') node.addEventListener('click', async () => {
+      const item = Ext.items.find((x) => x.id === node.dataset.id);
+      if (!item) return;
+      openModal(`<h3>Remove ${esc(item.name)}?</h3><p>Its files and stored data are deleted from this device.</p>
+        <div class="modal-actions"><button class="ghost-btn" data-act="modalClose">Cancel</button><button class="primary-btn" data-ext="removeConfirm" data-id="${item.id}">Remove</button></div>`);
+      const confirmBtn = $('#modalCard [data-ext="removeConfirm"]');
+      if (confirmBtn) confirmBtn.addEventListener('click', async () => {
+        await idbDel(item.id);
+        localStorage.removeItem(extStoreKey(item.id));
+        Ext.items = Ext.items.filter((x) => x.id !== item.id);
+        closeModal(); renderSheet(true); toast('Extension removed');
+      });
+    });
+    if (kind === 'popup') node.addEventListener('click', () => Ext.openPopup(node.dataset.id));
+  });
+
+  if (fileInput) fileInput.addEventListener('change', async () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    toast('Reading ' + file.name + '…');
+    try { await installFromFile(file); }
+    catch (err) { toast(String(err.message || err)); }
+    fileInput.value = '';
+  });
+  if (folderInput) folderInput.addEventListener('change', async () => {
+    if (!folderInput.files || !folderInput.files.length) return;
+    toast('Reading folder…');
+    try { await installFromFolder(folderInput.files); }
+    catch (err) { toast(String(err.message || err)); }
+    folderInput.value = '';
+  });
+};
+
+Ext.openPopup = async (id) => {
+  const record = Ext.items.find((x) => x.id === id);
+  if (!record) return;
+  if (!record.enabled) { toast('Enable the extension first'); return; }
+  const doc = popupDocument(record);
+  if (!doc) { toast('This extension has no popup page'); return; }
+  openModal(`<h3 style="display:flex;align-items:center;gap:10px">${esc(record.name)} <span class="perm">popup</span></h3>
+    <div class="ext-popup-preview"><iframe data-ext="${record.id}" sandbox="allow-scripts allow-forms allow-popups" title="${esc(record.name)} popup"></iframe></div>
+    <p style="font-size:11.5px">Running in a sandbox with a chrome.* shim. Data written by the popup is kept per extension.</p>
+    <div class="modal-actions"><button class="primary-btn" data-act="modalClose">Done</button></div>`,
+    () => {
+      const frame = document.querySelector(`iframe[data-ext="${record.id}"]`);
+      if (frame) frame.srcdoc = doc;
+    });
+};
+
+Ext.init = async () => {
+  try {
+    Ext.items = (await idbAll()).map((rec) => ({
+      ...rec,
+      enabled: rec.enabled !== false,
+      permissions: rec.permissions || [],
+      contentScripts: rec.contentScripts || []
+    })).sort((a, b) => a.installedAt - b.installedAt);
+  } catch {
+    Ext.items = [];
+  }
+  Ext.ready = true;
+  if (sheetStack[sheetStack.length - 1] === 'extensions' && !$('#sheet').hidden) renderSheet(true);
+};
+
+window.Ext = Ext;
+
+
+'use strict';
+/* ============================================================
+   Titanium — boot
+   ============================================================ */
+
+let wired = false;
+
+function hideBoot() {
+  const boot = $('#boot');
+  if (!boot) return;
+  boot.classList.add('hide');
+  setTimeout(() => { boot.hidden = true; }, 380);
+}
+
+function startApp() {
+  $('#onboard').hidden = true;
+  $('#app').hidden = false;
+  applySettings();
+  renderTopbar();
+  renderHome();
+  renderView();
+  hideBoot();
+}
+
+function applyCssOverride() {
+  try {
+    const css = localStorage.getItem('ti.css.override');
+    if (!css) return;
+    const tag = document.createElement('style');
+    tag.id = 'ti-css-override';
+    tag.textContent = css;
+    document.head.appendChild(tag);
+  } catch { /* storage blocked */ }
+}
+
+function bootTitanium() {
+  applyCssOverride();
+  $('#onboardNext').addEventListener('click', obNext);
+  $('#onboardBack').addEventListener('click', obBack);
+  $('#skipOnboard').addEventListener('click', () => {
+    S.heardFrom = S.heardFrom || 'not specified';
+    S.onboarded = true;
+    S.account = S.account || { name: 'Guest', email: '', guest: true, createdAt: Date.now() };
+    save();
+    $('#onboard').hidden = true;
+    startApp();
+    toast('You can finish setup any time in the menu');
+  });
+
+  window.addEventListener('scroll', () => {
+    const top = window.scrollY || document.documentElement.scrollTop;
+    $('#topbar').classList.toggle('scrolled', top > 6);
+  }, { passive: true });
+
+  if (!wired) {
+    wire();
+    wired = true;
+  }
+
+  applySettings();
+
+  if (S.onboarded) {
+    startApp();
+  } else {
+    hideBoot();
+    startOnboarding();
+  }
+
+  Ext.init();
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootTitanium);
+else bootTitanium();
+</script>
+</body>
+</html>

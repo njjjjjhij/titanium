@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en" data-theme="midnight" data-device="mobile" data-density="comfortable">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#15161a">
+  <meta name="description" content="Titanium — a private, customizable browser with ad blocking, a VPN, history delegation, extensions and three plans.">
+  <title>Titanium</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <style>/*STYLES*/</style>
+</head>
+<body>
+  <div class="boot" id="boot">
+    <img src="icon.svg" alt="" class="boot-icon" onerror="this.style.display='none'">
+    <div class="boot-name">Titanium</div>
+    <div class="boot-sub">Metal for the web</div>
+  </div>
+
+  <!-- ============ ONBOARDING ============ -->
+  <div class="onboard" id="onboard" hidden>
+    <div class="onboard-shell">
+      <div class="onboard-top">
+        <div class="brand"><span class="brand-mark">Ti</span> Titanium</div>
+        <button class="ghost-btn" id="skipOnboard">Skip setup</button>
+      </div>
+      <div class="progress" id="progress"></div>
+      <div class="onboard-body" id="onboardBody"></div>
+      <div class="onboard-foot">
+        <button class="ghost-btn" id="onboardBack">Back</button>
+        <button class="primary-btn" id="onboardNext">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div class="app" id="app" hidden>
+    <header class="topbar" id="topbar">
+      <button class="icon-btn" id="homeBtn" aria-label="Home" title="Home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.6 12 4l8 6.6M6.4 9.4V20h11.2V9.4" /></svg>
+      </button>
+      <div class="tabstrip" id="tabstrip" role="tablist" aria-label="Tabs"></div>
+      <button class="icon-btn" id="newTabBtn" aria-label="New tab" title="New tab (Ctrl+T)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      </button>
+      <button class="count-chip" id="tabCountBtn" aria-label="Tab switcher" title="All tabs">1</button>
+      <button class="icon-btn" id="menuBtn" aria-label="Menu" title="Menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </header>
+
+    <main class="stage">
+      <section class="home" id="homeView">
+        <div class="home-head">
+          <div class="hello" id="hello">Good evening</div>
+          <button class="plan-pill" id="planPill">Free</button>
+        </div>
+
+        <form class="searchpill" id="searchForm" autocomplete="off">
+          <span class="engine-badge" id="engineBadge">D</span>
+          <input id="searchInput" type="text" inputmode="search" enterkeyhint="go"
+                 placeholder="Search DuckDuckGo or type URL" aria-label="Search or enter address">
+          <button type="button" class="mic" id="micBtn" aria-label="Voice search" title="Voice search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+          </button>
+        </form>
+        <div class="suggest" id="suggest" hidden></div>
+
+        <div class="engine-strip" id="engineStrip" aria-label="Search engines"></div>
+
+        <div class="homegrid">
+          <button class="card addnew" id="addShortcutBtn">
+            <span class="plus-tile">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+            <span class="addnew-label">Add new</span>
+          </button>
+
+          <div class="card safety" id="safetyCard">
+            <div class="card-kicker">Safety Check</div>
+            <div class="safety-row">
+              <span class="shield-tile">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 19 6v6.1c0 4.3-3 7.6-7 8.9-4-1.3-7-4.6-7-8.9V6l7-2.8Z"/></svg>
+              </span>
+              <div class="safety-copy">
+                <h3 id="safetyTitle">Turn on Safe Browsing</h3>
+                <p id="safetyText">Get protection against dangerous sites</p>
+              </div>
+            </div>
+            <button class="accent-btn" id="safetyBtn">Go to settings</button>
+          </div>
+        </div>
+
+        <div class="quicklinks" id="quicklinks"></div>
+
+        <div class="card status-card" id="statusCard">
+          <div class="status-item"><span class="dot" id="dotVpn"></span><div><b id="vpnStatus">VPN off</b><small id="vpnSub">No tunnel active</small></div></div>
+          <div class="status-item"><span class="dot" id="dotBlock"></span><div><b id="blockStatus">Ad block on</b><small id="blockSub">Balanced filtering</small></div></div>
+          <div class="status-item"><span class="dot" id="dotHist"></span><div><b id="histStatus">History on</b><small id="histSub">Kept 7 days</small></div></div>
+        </div>
+
+        <div class="recent" id="recent"></div>
+      </section>
+
+      <section class="page" id="pageView" hidden>
+        <form class="addressbar" id="addressForm" autocomplete="off">
+          <button type="button" class="addr-btn" id="backBtn" aria-label="Back">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>
+          </button>
+          <span class="lock" id="lockIcon" title="Connection info">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8.5 10V8a3.5 3.5 0 0 1 7 0v2"/></svg>
+          </span>
+          <input id="addressInput" type="text" inputmode="url" enterkeyhint="go" aria-label="Address">
+          <button type="button" class="addr-btn" id="reloadBtn" aria-label="Reload">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.4-5.3M19 4v5h-5"/></svg>
+          </button>
+        </form>
+        <div class="frame-wrap" id="frameWrap">
+          <iframe id="frame" title="Page" referrerpolicy="no-referrer"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+          <div class="frame-fallback" id="frameFallback" hidden>
+            <div class="ff-inner">
+              <span class="ff-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10M12 18h.01"/><rect x="3" y="3" width="18" height="18" rx="5"/></svg>
+              </span>
+              <h3>This site won't load inside Titanium</h3>
+              <p id="ffSite">The site blocks embedding with a security header (X-Frame-Options or CSP). A single-file browser can't bypass it — your normal Chrome install can open it.</p>
+              <div class="ff-actions">
+                <button class="primary-btn" id="ffOpen">Open in system browser</button>
+                <button class="ghost-btn" id="ffCopy">Copy link</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ SHEET (settings, panels) ============ -->
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet-shell">
+      <header class="sheet-head">
+        <button class="icon-btn" id="sheetBack" aria-label="Back">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>
+        </button>
+        <h2 id="sheetTitle">Settings</h2>
+        <button class="icon-btn" id="sheetClose" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+      <div class="sheet-body" id="sheetBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card" id="modalCard"></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>/*SCRIPT*/</script>
+</body>
+</html>

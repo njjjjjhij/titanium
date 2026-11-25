@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Titanium browser icon">
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b3240"/>
+      <stop offset="0.55" stop-color="#1b1f27"/>
+      <stop offset="1" stop-color="#12151b"/>
+    </linearGradient>
+    <linearGradient id="metal" gradientUnits="userSpaceOnUse" x1="188" y1="160" x2="324" y2="350">
+      <stop offset="0" stop-color="#eef3ff"/>
+      <stop offset="0.42" stop-color="#9fb6d6"/>
+      <stop offset="0.72" stop-color="#7c93b3"/>
+      <stop offset="1" stop-color="#c9d8ee"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8ab4f8"/>
+      <stop offset="1" stop-color="#4a8cf7"/>
+    </linearGradient>
+    <path id="shield" d="M256 96 L368 140 C368 274 322 358 256 404 C190 358 144 274 144 140 Z"/>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#plate)"/>
+  <rect x="14" y="14" width="484" height="484" rx="100" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="3"/>
+
+  <g opacity="0.95">
+    <use href="#shield" fill="none" stroke="url(#beam)" stroke-width="18" stroke-linejoin="round"/>
+  </g>
+
+  <path d="M188 178 H324" stroke="url(#metal)" stroke-width="34" stroke-linecap="round"/>
+  <path d="M256 178 V338" stroke="url(#metal)" stroke-width="34" stroke-linecap="round"/>
+
+  <circle cx="360" cy="150" r="16" fill="url(#beam)"/>
+</svg>

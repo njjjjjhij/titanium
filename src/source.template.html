@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="midnight">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15161a">
+  <title>Titanium — source</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>/*STYLES*/</style>
+  <style>
+    .src-head {
+      position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 13px clamp(14px, 3vw, 30px); flex-wrap: wrap;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(16px); border-bottom: 1px solid var(--line);
+    }
+    .src-tag { font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; }
+    .src-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .src-actions .ghost-btn, .src-actions .mini-btn { padding: 8px 13px; font-size: 12.5px; }
+    .src-wrap { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: calc(100dvh - 60px); }
+    .src-list { border-right: 1px solid var(--line); padding: 14px 10px; display: flex; flex-direction: column; gap: 3px; position: sticky; top: 60px; align-self: start; max-height: calc(100dvh - 60px); overflow: auto; }
+    .src-file { display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 0; background: transparent; color: var(--text); text-align: left; padding: 9px 11px; border-radius: 10px; font-size: 13px; }
+    .src-file:hover { background: var(--card-2); }
+    .src-file[aria-current="true"] { background: var(--card); box-shadow: inset 0 0 0 1px var(--line-strong); }
+    .src-file small { color: var(--muted-2); font-size: 10.5px; white-space: nowrap; }
+    .src-main { padding: 16px clamp(12px, 2.5vw, 26px) 44px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .src-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .src-bar b { font-size: 15px; }
+    .src-bar small { display: block; color: var(--muted-2); font-size: 11.5px; }
+    .src-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .src-code, .src-editor {
+      margin: 0; padding: 18px; border-radius: 14px; background: #0e1014; border: 1px solid var(--line);
+      color: #d7e0ef; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px; line-height: 1.62; max-height: 74dvh;
+    }
+    .src-code { white-space: pre; }
+    .src-editor { width: 100%; min-height: 62dvh; resize: vertical; }
+    .src-note { color: var(--muted); font-size: 12.5px; max-width: 82ch; margin: 0; }
+    .src-note b { color: var(--text); }
+    @media (max-width: 780px) {
+      .src-wrap { grid-template-columns: 1fr; }
+      .src-list { position: static; flex-direction: row; overflow-x: auto; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding: 10px 12px; }
+      .src-file { white-space: nowrap; }
+      .src-file small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="src-head">
+    <div class="brand"><span class="brand-mark">Ti</span> Titanium <span class="src-tag">source</span></div>
+    <div class="src-actions">
+      <button class="ghost-btn" id="applyCss">Apply CSS to my Titanium</button>
+      <button class="ghost-btn" id="resetCss">Reset CSS override</button>
+      <a class="ghost-btn" href="index.html">Open browser</a>
+      <a class="ghost-btn" href="README.md">README</a>
+    </div>
+  </header>
+  <div class="src-wrap">
+    <nav class="src-list" id="srcList" aria-label="Source files"></nav>
+    <main class="src-main">
+      <div class="src-bar">
+        <div><b id="srcName">…</b><small id="srcMeta"></small></div>
+        <div class="src-btns">
+          <button class="mini-btn" id="srcEdit">Edit</button>
+          <button class="mini-btn" id="srcCopy">Copy</button>
+          <button class="mini-btn accent" id="srcDownload">Download</button>
+        </div>
+      </div>
+      <pre class="src-code" id="srcCode"></pre>
+      <textarea class="src-editor" id="srcEditor" hidden spellcheck="false" aria-label="Edit source"></textarea>
+      <p class="src-note" id="srcNote"></p>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>window.SOURCE_FILES = /*SOURCES*/;</script>
+  <script>/*SOURCE_JS*/</script>
+</body>
+</html>
