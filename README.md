@@ -16,6 +16,10 @@
 
 Titanium is a browser surface: a start page, real tabs, fifteen search engines with their real logos, ad blocking controls, a VPN surface, Chrome extension loading, history with scoped delegation, and three plans — all inside one HTML file with no framework, no network calls and no server.
 
+Live at **https://njjjjjhij.github.io/titanium/** — no install, no account.
+
+Watch the [45-second promo](promo.mp4), or open [source.html](source.html) to read and edit every line in the browser.
+
 Open the file, answer five questions, and you land on a start screen shaped for the device you picked: full-bleed cards on mobile, a wider canvas on desktop.
 
 ## Screenshots
