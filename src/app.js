@@ -67,6 +67,7 @@ const DEFAULT_STATE = {
   onboarded: false,
   heardFrom: '',
   device: 'mobile',
+  pageDesktop: false,
   plan: 'free',
   engine: 'duckduckgo',
   customEngine: { name: '', url: '' },
@@ -327,6 +328,7 @@ function renderView() {
   $('#addressInput').value = t.url;
   const lock = $('#lockIcon');
   lock.classList.toggle('insecure', !/^https:/i.test(t.url));
+  applyPageMode();
   loadFrame(t.url);
 }
 
@@ -341,6 +343,7 @@ function loadFrame(url) {
     return;
   }
   frame.src = url;
+  setTimeout(fitPageFrame, 60);
   frameTimer = setTimeout(() => {
     let blocked = false;
     try {
@@ -353,6 +356,43 @@ function loadFrame(url) {
     }
   }, 3200);
 }
+
+/* ---------- page mode (mobile vs desktop site) ---------- */
+function fitPageFrame() {
+  const wrap = $('#frameWrap');
+  if (!wrap) return;
+  if (!wrap.classList.contains('desktop')) {
+    wrap.style.removeProperty('--fit');
+    wrap.style.removeProperty('--vh');
+    return;
+  }
+  const w = wrap.clientWidth || 1;
+  const h = wrap.clientHeight || 1;
+  // fit the desktop width to the screen, then grow the desktop viewport height
+  // so the site fills the whole area instead of sitting in a letterbox
+  const fit = Math.max(0.15, w / 1280);
+  wrap.style.setProperty('--fit', String(fit));
+  wrap.style.setProperty('--vh', Math.max(600, Math.round(h / fit)) + 'px');
+}
+
+function applyPageMode() {
+  const wrap = $('#frameWrap');
+  const btn = $('#modeBtn');
+  if (!wrap) return;
+  const on = !!S.pageDesktop;
+  wrap.classList.toggle('desktop', on);
+  if (btn) {
+    btn.setAttribute('aria-pressed', String(on));
+    btn.title = on ? 'Mobile site — switch back to the phone layout' : 'PC mode — load the desktop version of this site';
+  }
+  fitPageFrame();
+  requestAnimationFrame(fitPageFrame);
+}
+
+window.addEventListener('resize', () => {
+  clearTimeout(window.__fitTimer);
+  window.__fitTimer = setTimeout(fitPageFrame, 120);
+});
 
 /* ---------- home ---------- */
 function renderHome() {
@@ -541,6 +581,10 @@ function wire() {
     navigate($('#addressInput').value, { replace: true });
   });
   $('#backBtn').addEventListener('click', back);
+  $('#modeBtn').addEventListener('click', () => ACTIONS.pageMode());
+  if (window.ResizeObserver && $('#frameWrap')) {
+    new ResizeObserver(() => fitPageFrame()).observe($('#frameWrap'));
+  }
   $('#reloadBtn').addEventListener('click', () => loadFrame(activeTab().url));
 
   $('#ffOpen').addEventListener('click', () => {

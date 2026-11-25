@@ -135,7 +135,9 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .app {
   max-width: var(--shell-max);
   margin: 0 auto;
+  height: 100dvh;
   min-height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, var(--accent) 4%), var(--bg) 240px);
@@ -143,6 +145,7 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 }
 @media (min-width: 700px) {
   .app {
+    height: calc(100dvh - 48px);
     min-height: calc(100dvh - 48px);
     margin: 24px auto;
     border: 1px solid var(--line);
@@ -151,7 +154,7 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
     box-shadow: var(--shadow), 0 0 0 8px rgba(255, 255, 255, .02);
   }
 }
-html[data-device="pc"] .app { max-width: 1180px; min-height: 100dvh; margin: 0 auto; border-radius: 0; border: 0; box-shadow: none; }
+html[data-device="pc"] .app { max-width: 1180px; height: 100dvh; min-height: 100dvh; margin: 0 auto; border-radius: 0; border: 0; box-shadow: none; }
 html[data-device="pc"] .home { padding: 26px clamp(20px, 4vw, 52px) 40px; }
 html[data-device="pc"] .homegrid { grid-template-columns: 1.05fr .95fr; align-items: stretch; }
 html[data-device="pc"] .safety-row { gap: 18px; }
@@ -162,15 +165,15 @@ html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-co
 .topbar {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 6px;
-  padding: calc(10px + env(safe-area-inset-top)) 12px 10px;
+  padding: calc(6px + env(safe-area-inset-top)) 8px 6px;
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(18px) saturate(140%);
   border-bottom: 1px solid transparent;
 }
 .topbar.scrolled { border-bottom-color: var(--line); }
 .icon-btn {
-  flex: 0 0 auto; width: 40px; height: 40px; display: grid; place-items: center;
-  border: 0; border-radius: 12px; background: transparent; color: var(--text);
+  flex: 0 0 auto; width: 36px; height: 36px; display: grid; place-items: center;
+  border: 0; border-radius: 11px; background: transparent; color: var(--text);
 }
 .icon-btn:hover { background: var(--card-2); }
 .icon-btn:active { transform: scale(.94); }
@@ -180,7 +183,7 @@ html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-co
 }
 .tabstrip::-webkit-scrollbar { display: none; }
 .tab-tile {
-  flex: 0 0 auto; min-width: 40px; height: 40px; padding: 0 10px;
+  flex: 0 0 auto; min-width: 34px; height: 34px; padding: 0 8px;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   border: 0; border-radius: 12px;
   background: var(--card-2); color: var(--text);
@@ -198,7 +201,8 @@ html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-co
 
 /* ---------- home ---------- */
 .stage { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
-.home { padding: 6px var(--pad) 40px; display: flex; flex-direction: column; gap: var(--gap); }
+.home { padding: 6px var(--pad) 40px; display: flex; flex-direction: column; gap: var(--gap); flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.home > * { flex: 0 0 auto; }
 .home-head { display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 2px; }
 .hello { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .01em; }
 .plan-pill {
@@ -320,21 +324,27 @@ html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-co
 /* ---------- page view ---------- */
 .page { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
 .addressbar {
-  display: flex; align-items: center; gap: 6px; margin: 4px var(--pad) 10px;
-  padding: 6px 6px 6px 10px; background: var(--card); border: 1px solid var(--line);
+  display: flex; align-items: center; gap: 4px; margin: 0 8px 6px;
+  padding: 3px 4px 3px 8px; background: var(--card); border: 1px solid var(--line);
   border-radius: 999px;
 }
-.addressbar input { flex: 1 1 auto; min-width: 0; border: 0; background: transparent; outline: none; font-size: 14px; font-weight: 550; }
+.addressbar input { flex: 1 1 auto; min-width: 0; border: 0; background: transparent; outline: none; font-size: 13.5px; font-weight: 550; }
 .lock { display: grid; place-items: center; color: var(--ok); }
 .lock svg { width: 15px; height: 15px; }
 .lock.insecure { color: var(--muted-2); }
-.addr-btn { border: 0; background: transparent; color: var(--text); width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; }
+.addr-btn { border: 0; background: transparent; color: var(--text); width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; }
 .addr-btn:hover { background: var(--card-2); }
+.addr-btn[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 24%, var(--card-2)); color: var(--accent); }
 
-.frame-wrap { position: relative; flex: 1 1 auto; min-height: 48vh; margin: 0 var(--pad) 16px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: var(--card); }
-.frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; min-height: 48vh; }
-html[data-device="pc"] .frame-wrap { flex: 1 1 auto; min-height: 62vh; }
-html[data-device="pc"] .frame-wrap iframe { min-height: 62vh; }
+/* the page itself is edge-to-edge: no card, no margins, full remaining height */
+.frame-wrap { position: relative; flex: 1 1 auto; min-height: 0; margin: 0; border: 0; border-radius: 0; overflow: hidden; background: #fff; }
+.frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; min-height: 0; }
+
+/* PC mode: render the site at a 1280x900 desktop viewport, scaled to fit */
+.frame-wrap.desktop iframe {
+  position: absolute; top: 0; left: 50%; width: 1280px; height: var(--vh, 900px);
+  margin-left: -640px; transform: scale(var(--fit, 1)); transform-origin: top center;
+}
 .frame-fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: var(--card); }
 .ff-inner { max-width: 360px; text-align: center; }
 .ff-icon { width: 58px; height: 58px; border-radius: 18px; display: inline-grid; place-items: center; background: var(--card-2); color: var(--accent); margin-bottom: 12px; }
@@ -699,6 +709,9 @@ html.no-anim *, html.no-anim *::before, html.no-anim *::after { transition: none
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8.5 10V8a3.5 3.5 0 0 1 7 0v2"/></svg>
           </span>
           <input id="addressInput" type="text" inputmode="url" enterkeyhint="go" aria-label="Address">
+          <button type="button" class="addr-btn" id="modeBtn" aria-label="PC mode" title="PC mode — load the desktop version of this site" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>
+          </button>
           <button type="button" class="addr-btn" id="reloadBtn" aria-label="Reload">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.4-5.3M19 4v5h-5"/></svg>
           </button>
@@ -888,6 +901,7 @@ const DEFAULT_STATE = {
   onboarded: false,
   heardFrom: '',
   device: 'mobile',
+  pageDesktop: false,
   plan: 'free',
   engine: 'duckduckgo',
   customEngine: { name: '', url: '' },
@@ -1148,6 +1162,7 @@ function renderView() {
   $('#addressInput').value = t.url;
   const lock = $('#lockIcon');
   lock.classList.toggle('insecure', !/^https:/i.test(t.url));
+  applyPageMode();
   loadFrame(t.url);
 }
 
@@ -1162,6 +1177,7 @@ function loadFrame(url) {
     return;
   }
   frame.src = url;
+  setTimeout(fitPageFrame, 60);
   frameTimer = setTimeout(() => {
     let blocked = false;
     try {
@@ -1174,6 +1190,43 @@ function loadFrame(url) {
     }
   }, 3200);
 }
+
+/* ---------- page mode (mobile vs desktop site) ---------- */
+function fitPageFrame() {
+  const wrap = $('#frameWrap');
+  if (!wrap) return;
+  if (!wrap.classList.contains('desktop')) {
+    wrap.style.removeProperty('--fit');
+    wrap.style.removeProperty('--vh');
+    return;
+  }
+  const w = wrap.clientWidth || 1;
+  const h = wrap.clientHeight || 1;
+  // fit the desktop width to the screen, then grow the desktop viewport height
+  // so the site fills the whole area instead of sitting in a letterbox
+  const fit = Math.max(0.15, w / 1280);
+  wrap.style.setProperty('--fit', String(fit));
+  wrap.style.setProperty('--vh', Math.max(600, Math.round(h / fit)) + 'px');
+}
+
+function applyPageMode() {
+  const wrap = $('#frameWrap');
+  const btn = $('#modeBtn');
+  if (!wrap) return;
+  const on = !!S.pageDesktop;
+  wrap.classList.toggle('desktop', on);
+  if (btn) {
+    btn.setAttribute('aria-pressed', String(on));
+    btn.title = on ? 'Mobile site — switch back to the phone layout' : 'PC mode — load the desktop version of this site';
+  }
+  fitPageFrame();
+  requestAnimationFrame(fitPageFrame);
+}
+
+window.addEventListener('resize', () => {
+  clearTimeout(window.__fitTimer);
+  window.__fitTimer = setTimeout(fitPageFrame, 120);
+});
 
 /* ---------- home ---------- */
 function renderHome() {
@@ -1362,6 +1415,10 @@ function wire() {
     navigate($('#addressInput').value, { replace: true });
   });
   $('#backBtn').addEventListener('click', back);
+  $('#modeBtn').addEventListener('click', () => ACTIONS.pageMode());
+  if (window.ResizeObserver && $('#frameWrap')) {
+    new ResizeObserver(() => fitPageFrame()).observe($('#frameWrap'));
+  }
   $('#reloadBtn').addEventListener('click', () => loadFrame(activeTab().url));
 
   $('#ffOpen').addEventListener('click', () => {
@@ -1850,6 +1907,7 @@ PANELS.root = () => ({
     <div class="list">
       ${rowButton({ icon: 'tabs', title: 'Tabs', sub: `${tabs.length} open`, panel: 'tabs' })}
       ${rowButton({ icon: 'search', title: 'Search engine', sub: engine().name, panel: 'engines' })}
+      ${rowButton({ icon: 'monitor', title: 'PC mode', sub: S.pageDesktop ? 'Sites load their desktop version' : 'Sites load their mobile version', act: 'pageMode', right: `<span class="perm">${S.pageDesktop ? 'On' : 'Off'}</span>` })}
       ${rowButton({ icon: 'clock', title: 'History', sub: S.history.on ? `${S.history.items.length} entries · ${S.history.retention} days` : 'Off', panel: 'history' })}
       ${rowButton({ icon: 'download', title: 'Delegation', sub: S.delegation.active ? `Granted to ${S.delegation.active.label}` : 'Not delegated', panel: 'delegation' })}
     </div>
@@ -1950,6 +2008,7 @@ PANELS.appearance = () => ({
           ${[['color', 'Colour'], ['mono', 'Mono']].map(([id, label]) => `<button class="chip" data-act="iconStyle" data-icons="${id}" aria-pressed="${S.theme.iconStyle === id}">${label}</button>`).join('')}
         </div>
       </div>
+      ${toggleRow({ title: 'PC mode for sites', sub: 'Load pages at a 1280×900 desktop viewport', path: 'pageDesktop', checked: S.pageDesktop })}
       ${toggleRow({ title: 'Ambient wallpaper glow', sub: 'Tint the canvas with your accent colour', path: 'theme.wallpaper', checked: S.theme.wallpaper })}
       ${toggleRow({ title: 'Show tab names', sub: 'Off keeps the top strip icon-only, like a phone', path: 'theme.tabLabels', checked: S.theme.tabStyle === 'tiles' })}
     </div>
@@ -2392,7 +2451,20 @@ const ACTIONS = {
     applySettings();
     renderHome();
     renderSheet(true);
+    if (path === 'pageDesktop') {
+      applyPageMode();
+      if (activeTab().url) loadFrame(activeTab().url);
+    }
     toast(`${next ? 'On' : 'Off'} · ${path.split('.').pop()}`);
+  },
+
+  pageMode: () => {
+    S.pageDesktop = !S.pageDesktop;
+    save();
+    applyPageMode();
+    if (activeTab().url) loadFrame(activeTab().url);
+    renderSheet(true);
+    toast(S.pageDesktop ? 'PC mode — desktop site' : 'Mobile site');
   },
 
   input: (el) => {

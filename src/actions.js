@@ -28,7 +28,20 @@ const ACTIONS = {
     applySettings();
     renderHome();
     renderSheet(true);
+    if (path === 'pageDesktop') {
+      applyPageMode();
+      if (activeTab().url) loadFrame(activeTab().url);
+    }
     toast(`${next ? 'On' : 'Off'} · ${path.split('.').pop()}`);
+  },
+
+  pageMode: () => {
+    S.pageDesktop = !S.pageDesktop;
+    save();
+    applyPageMode();
+    if (activeTab().url) loadFrame(activeTab().url);
+    renderSheet(true);
+    toast(S.pageDesktop ? 'PC mode — desktop site' : 'Mobile site');
   },
 
   input: (el) => {

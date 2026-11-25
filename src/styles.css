@@ -125,7 +125,9 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .app {
   max-width: var(--shell-max);
   margin: 0 auto;
+  height: 100dvh;
   min-height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, var(--accent) 4%), var(--bg) 240px);
@@ -133,6 +135,7 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 }
 @media (min-width: 700px) {
   .app {
+    height: calc(100dvh - 48px);
     min-height: calc(100dvh - 48px);
     margin: 24px auto;
     border: 1px solid var(--line);
@@ -141,7 +144,7 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
     box-shadow: var(--shadow), 0 0 0 8px rgba(255, 255, 255, .02);
   }
 }
-html[data-device="pc"] .app { max-width: 1180px; min-height: 100dvh; margin: 0 auto; border-radius: 0; border: 0; box-shadow: none; }
+html[data-device="pc"] .app { max-width: 1180px; height: 100dvh; min-height: 100dvh; margin: 0 auto; border-radius: 0; border: 0; box-shadow: none; }
 html[data-device="pc"] .home { padding: 26px clamp(20px, 4vw, 52px) 40px; }
 html[data-device="pc"] .homegrid { grid-template-columns: 1.05fr .95fr; align-items: stretch; }
 html[data-device="pc"] .safety-row { gap: 18px; }
@@ -152,15 +155,15 @@ html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-co
 .topbar {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 6px;
-  padding: calc(10px + env(safe-area-inset-top)) 12px 10px;
+  padding: calc(6px + env(safe-area-inset-top)) 8px 6px;
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(18px) saturate(140%);
   border-bottom: 1px solid transparent;
 }
 .topbar.scrolled { border-bottom-color: var(--line); }
 .icon-btn {
-  flex: 0 0 auto; width: 40px; height: 40px; display: grid; place-items: center;
-  border: 0; border-radius: 12px; background: transparent; color: var(--text);
+  flex: 0 0 auto; width: 36px; height: 36px; display: grid; place-items: center;
+  border: 0; border-radius: 11px; background: transparent; color: var(--text);
 }
 .icon-btn:hover { background: var(--card-2); }
 .icon-btn:active { transform: scale(.94); }
@@ -170,7 +173,7 @@ html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-co
 }
 .tabstrip::-webkit-scrollbar { display: none; }
 .tab-tile {
-  flex: 0 0 auto; min-width: 40px; height: 40px; padding: 0 10px;
+  flex: 0 0 auto; min-width: 34px; height: 34px; padding: 0 8px;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   border: 0; border-radius: 12px;
   background: var(--card-2); color: var(--text);
@@ -188,7 +191,8 @@ html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-co
 
 /* ---------- home ---------- */
 .stage { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
-.home { padding: 6px var(--pad) 40px; display: flex; flex-direction: column; gap: var(--gap); }
+.home { padding: 6px var(--pad) 40px; display: flex; flex-direction: column; gap: var(--gap); flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.home > * { flex: 0 0 auto; }
 .home-head { display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 2px; }
 .hello { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .01em; }
 .plan-pill {
@@ -310,21 +314,27 @@ html[data-device="pc"] .status-card { flex-direction: row; gap: 30px; justify-co
 /* ---------- page view ---------- */
 .page { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
 .addressbar {
-  display: flex; align-items: center; gap: 6px; margin: 4px var(--pad) 10px;
-  padding: 6px 6px 6px 10px; background: var(--card); border: 1px solid var(--line);
+  display: flex; align-items: center; gap: 4px; margin: 0 8px 6px;
+  padding: 3px 4px 3px 8px; background: var(--card); border: 1px solid var(--line);
   border-radius: 999px;
 }
-.addressbar input { flex: 1 1 auto; min-width: 0; border: 0; background: transparent; outline: none; font-size: 14px; font-weight: 550; }
+.addressbar input { flex: 1 1 auto; min-width: 0; border: 0; background: transparent; outline: none; font-size: 13.5px; font-weight: 550; }
 .lock { display: grid; place-items: center; color: var(--ok); }
 .lock svg { width: 15px; height: 15px; }
 .lock.insecure { color: var(--muted-2); }
-.addr-btn { border: 0; background: transparent; color: var(--text); width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; }
+.addr-btn { border: 0; background: transparent; color: var(--text); width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; }
 .addr-btn:hover { background: var(--card-2); }
+.addr-btn[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 24%, var(--card-2)); color: var(--accent); }
 
-.frame-wrap { position: relative; flex: 1 1 auto; min-height: 48vh; margin: 0 var(--pad) 16px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: var(--card); }
-.frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; min-height: 48vh; }
-html[data-device="pc"] .frame-wrap { flex: 1 1 auto; min-height: 62vh; }
-html[data-device="pc"] .frame-wrap iframe { min-height: 62vh; }
+/* the page itself is edge-to-edge: no card, no margins, full remaining height */
+.frame-wrap { position: relative; flex: 1 1 auto; min-height: 0; margin: 0; border: 0; border-radius: 0; overflow: hidden; background: #fff; }
+.frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; min-height: 0; }
+
+/* PC mode: render the site at a 1280x900 desktop viewport, scaled to fit */
+.frame-wrap.desktop iframe {
+  position: absolute; top: 0; left: 50%; width: 1280px; height: var(--vh, 900px);
+  margin-left: -640px; transform: scale(var(--fit, 1)); transform-origin: top center;
+}
 .frame-fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: var(--card); }
 .ff-inner { max-width: 360px; text-align: center; }
 .ff-icon { width: 58px; height: 58px; border-radius: 18px; display: inline-grid; place-items: center; background: var(--card-2); color: var(--accent); margin-bottom: 12px; }

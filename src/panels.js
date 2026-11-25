@@ -86,6 +86,7 @@ PANELS.root = () => ({
     <div class="list">
       ${rowButton({ icon: 'tabs', title: 'Tabs', sub: `${tabs.length} open`, panel: 'tabs' })}
       ${rowButton({ icon: 'search', title: 'Search engine', sub: engine().name, panel: 'engines' })}
+      ${rowButton({ icon: 'monitor', title: 'PC mode', sub: S.pageDesktop ? 'Sites load their desktop version' : 'Sites load their mobile version', act: 'pageMode', right: `<span class="perm">${S.pageDesktop ? 'On' : 'Off'}</span>` })}
       ${rowButton({ icon: 'clock', title: 'History', sub: S.history.on ? `${S.history.items.length} entries · ${S.history.retention} days` : 'Off', panel: 'history' })}
       ${rowButton({ icon: 'download', title: 'Delegation', sub: S.delegation.active ? `Granted to ${S.delegation.active.label}` : 'Not delegated', panel: 'delegation' })}
     </div>
@@ -186,6 +187,7 @@ PANELS.appearance = () => ({
           ${[['color', 'Colour'], ['mono', 'Mono']].map(([id, label]) => `<button class="chip" data-act="iconStyle" data-icons="${id}" aria-pressed="${S.theme.iconStyle === id}">${label}</button>`).join('')}
         </div>
       </div>
+      ${toggleRow({ title: 'PC mode for sites', sub: 'Load pages at a 1280×900 desktop viewport', path: 'pageDesktop', checked: S.pageDesktop })}
       ${toggleRow({ title: 'Ambient wallpaper glow', sub: 'Tint the canvas with your accent colour', path: 'theme.wallpaper', checked: S.theme.wallpaper })}
       ${toggleRow({ title: 'Show tab names', sub: 'Off keeps the top strip icon-only, like a phone', path: 'theme.tabLabels', checked: S.theme.tabStyle === 'tiles' })}
     </div>
