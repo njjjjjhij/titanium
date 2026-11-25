@@ -1,0 +1,1 @@
+Trigger for the hydrate workflow. Any commit whose message contains [hydrate] re-downloads the build payload and refreshes index.html, source.html, sources, screenshots and promo.mp4.
